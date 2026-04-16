@@ -1,0 +1,59 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Mabadiliko ya stoo{% else %}Stock movements{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Historia ya mabadiliko ya stoo{% else %}Stock movement audit log{% endif %}{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <form method="get" action="{% url 'stock_movements' %}" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+    <input type="search" name="q" class="input" value="{{ request.GET.q|default:'' }}" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta dawa…{% else %}Search medicine…{% endif %}">
+    <select name="reason" class="input select">
+      <option value="">{% if request.LANGUAGE_CODE == 'sw' %}Sababu zote{% else %}All reasons{% endif %}</option>
+      <option value="sale" {% if request.GET.reason == 'sale' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Mauzo{% else %}Sale{% endif %}</option>
+      <option value="restock" {% if request.GET.reason == 'restock' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Ongeza stoo{% else %}Restock{% endif %}</option>
+      <option value="adjustment" {% if request.GET.reason == 'adjustment' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Marekebisho{% else %}Adjustment{% endif %}</option>
+      <option value="expired" {% if request.GET.reason == 'expired' %}selected{% endif %}>{% if request.LANGUAGE_CODE == 'sw' %}Imekwisha muda{% else %}Expired{% endif %}</option>
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Chuja{% else %}Filter{% endif %}</button>
+    <a href="{% url 'stock_movements' %}" class="link-muted">{% if request.LANGUAGE_CODE == 'sw' %}Anza upya{% else %}Reset{% endif %}</a>
+  </form>
+  {% if pharmacy_is_admin %}
+  <a href="{% url 'inventory' %}" class="btn btn-secondary btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Rudi stoo{% else %}Back to inventory{% endif %}</a>
+  {% endif %}
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Tarehe{% else %}Date{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Dawa{% else %}Medicine{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mabadiliko{% else %}Change{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Sababu{% else %}Reason{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mtumiaji{% else %}User{% endif %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in movements %}
+      <tr>
+        <td class="date-cell">{{ row.date|date:"d M Y" }}<br><span class="card-hint">{{ row.date|date:"H:i" }}</span></td>
+        <td><strong>{{ row.medicine.name }}</strong></td>
+        <td>
+          {% if row.quantity_change > 0 %}
+          <span class="badge badge-ok">+{{ row.quantity_change }}</span>
+          {% else %}
+          <span class="badge badge-low">{{ row.quantity_change }}</span>
+          {% endif %}
+        </td>
+        <td><span class="badge badge-expiry-notice">{{ row.get_reason_display }}</span></td>
+        <td>{% if row.user %}{{ row.user.username }}{% else %}{% if request.LANGUAGE_CODE == 'sw' %}Mfumo{% else %}System{% endif %}{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Bado hakuna mabadiliko ya stoo yaliyorekodiwa.{% else %}No stock movements recorded yet.{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

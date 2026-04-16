@@ -1,0 +1,33 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Ongeza mtumiaji{% else %}Add user{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Ongeza mtumiaji{% else %}Add user{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <p class="card-hint" style="margin-top: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza taarifa za kuingia, chagua nafasi, na kwa mfanyakazi unaweza kumhusisha na meneja.{% else %}Create sign-in credentials, choose role, and optionally assign a manager for worker accounts.{% endif %}</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="message message-error" style="margin-bottom: 1rem;">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% for field in form %}
+    <div class="form-row">
+      <label for="{{ field.id_for_label }}">
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          {% if field.name == 'username' %}Jina la mtumiaji{% elif field.name == 'email' %}Barua pepe{% elif field.name == 'password1' %}Nenosiri{% elif field.name == 'password2' %}Thibitisha nenosiri{% elif field.name == 'role' %}Nafasi{% elif field.name == 'manager' %}Meneja{% else %}{{ field.label }}{% endif %}
+        {% else %}
+          {{ field.label }}
+        {% endif %}
+      </label>
+      {{ field }}
+      {{ field.errors }}
+    </div>
+    {% endfor %}
+    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;">
+      <button type="submit" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Unda mtumiaji{% else %}Create user{% endif %}</button>
+      <a href="{% url 'staff_list' %}" class="btn btn-secondary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

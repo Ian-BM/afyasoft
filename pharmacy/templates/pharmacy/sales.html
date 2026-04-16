@@ -1,0 +1,44 @@
+{% extends "pharmacy/base.html" %}
+{% load static %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Mauzo{% else %}Sales{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Sehemu ya kuuza{% else %}Point of sale{% endif %}{% endblock %}
+
+{% block content %}
+{{ medicines_data|json_script:"medicines-data" }}
+
+<form id="pos-form" method="post" action="{% url 'sales' %}">
+  {% csrf_token %}
+  <input type="hidden" name="cart_json" id="cart-json" value="[]">
+
+  <div class="pos-grid">
+    <div class="card pos-panel">
+      <label class="card-label" for="pos-search">{% if request.LANGUAGE_CODE == 'sw' %}Tafuta dawa{% else %}Search medicines{% endif %}</label>
+      <input type="search" id="pos-search" class="input pos-search" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Andika kuchuja kwa jina…{% else %}Type to filter by name…{% endif %}" autocomplete="off" value="{{ search }}">
+
+      <div id="medicine-list" class="medicine-list" role="listbox" aria-label="Medicines in stock"></div>
+    </div>
+
+    <div class="card pos-panel cart-panel">
+      <h2 class="section-title" style="margin-bottom: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Kikapu{% else %}Cart{% endif %}</h2>
+      <p class="card-hint" style="margin-top: 0.25rem;">{% if request.LANGUAGE_CODE == 'sw' %}Kagua bidhaa na maliza mauzo. Ukiwa nje ya mtandao, mauzo yanahifadhiwa na kusawazishwa kiotomatiki.{% else %}Review items and complete checkout. Offline sales are saved on this device and sync automatically.{% endif %}</p>
+      <div id="cart-lines" class="cart-lines"></div>
+      <div class="cart-total">
+        <span>{% if request.LANGUAGE_CODE == 'sw' %}Jumla{% else %}Total{% endif %}</span>
+        <span id="cart-total-amount">TZS 0.00</span>
+      </div>
+      <button type="submit" class="btn btn-primary touch-target btn-checkout">{% if request.LANGUAGE_CODE == 'sw' %}Kamilisha mauzo{% else %}Complete sale{% endif %}</button>
+      <p class="card-hint" style="margin-top: 0.75rem; text-align: center;">{% if request.LANGUAGE_CODE == 'sw' %}Mtandaoni: inafungua risiti. Nje ya mtandao: ona uthibitisho hapa chini.{% else %}Online: opens a receipt. Offline: see confirmation below.{% endif %}</p>
+    </div>
+  </div>
+</form>
+
+<section id="offline-receipt-panel" class="card offline-receipt-card" hidden>
+  <h2 class="section-title">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo ya nje ya mtandao yamehifadhiwa{% else %}Offline sale recorded{% endif %}</h2>
+  <div id="offline-receipt-body"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'pharmacy/js/pos.js' %}"></script>
+{% endblock %}

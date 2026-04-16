@@ -1,0 +1,24 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Kuongeza stoo{% else %}Restocking{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Kuongeza stoo{% else %}Restocking{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <p class="card-hint" style="margin-top: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza vipande kwa dawa iliyopo. Kiasi kitasasishwa mara moja.{% else %}Add units to an existing SKU. Quantities update immediately.{% endif %}</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-row">
+      <label for="id_medicine">{% if request.LANGUAGE_CODE == 'sw' %}Dawa{% else %}Medicine{% endif %}</label>
+      {{ form.medicine }}
+      {{ form.medicine.errors }}
+    </div>
+    <div class="form-row">
+      <label for="id_add_quantity">{% if request.LANGUAGE_CODE == 'sw' %}Kiasi cha kuongeza{% else %}Quantity to add{% endif %}</label>
+      {{ form.add_quantity }}
+      {{ form.add_quantity.errors }}
+    </div>
+    <button type="submit" class="btn btn-primary">{% if request.LANGUAGE_CODE == 'sw' %}Sasisha stoo{% else %}Update stock{% endif %}</button>
+  </form>
+</div>
+{% endblock %}

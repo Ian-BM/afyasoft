@@ -1,0 +1,112 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Ripoti{% else %}Reports{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Ripoti{% else %}Reports{% endif %}{% endblock %}
+
+{% block content %}
+<div class="grid-cards">
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Siku 7 zilizopita{% else %}Last 7 days{% endif %}</p>
+      <p class="card-value">TZS {{ week_total|floatformat:2 }}</p>
+      <p class="card-hint">{{ week_count }} {% if request.LANGUAGE_CODE == 'sw' %}miamala{% else %}transactions{% endif %}</p>
+    </div>
+    <div class="card-metric-icon" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+  </div>
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Siku 30 zilizopita{% else %}Last 30 days{% endif %}</p>
+      <p class="card-value">TZS {{ month_total|floatformat:2 }}</p>
+      <p class="card-hint">{{ month_count }} {% if request.LANGUAGE_CODE == 'sw' %}miamala{% else %}transactions{% endif %}</p>
+    </div>
+    <div class="card-metric-icon" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar" style="justify-content: flex-end;">
+  {% if pharmacy_is_admin %}
+  <a href="{% url 'stock_movements' %}" class="btn btn-secondary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Fungua historia ya mabadiliko ya stoo{% else %}Open stock movement audit log{% endif %}</a>
+  {% endif %}
+</div>
+
+<div class="card chart-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+    <h2 class="chart-title" style="margin:0;">{% if request.LANGUAGE_CODE == 'sw' %}Mwelekeo wa mapato{% else %}Revenue trend{% endif %}</h2>
+    <div style="display:flex;gap:0.4rem;">
+      <button type="button" class="btn btn-secondary btn-sm js-report-range" data-range="daily">{% if request.LANGUAGE_CODE == 'sw' %}Kila siku{% else %}Daily{% endif %}</button>
+      <button type="button" class="btn btn-secondary btn-sm js-report-range" data-range="weekly">{% if request.LANGUAGE_CODE == 'sw' %}Kila wiki{% else %}Weekly{% endif %}</button>
+      <button type="button" class="btn btn-secondary btn-sm js-report-range" data-range="monthly">{% if request.LANGUAGE_CODE == 'sw' %}Kila mwezi{% else %}Monthly{% endif %}</button>
+    </div>
+  </div>
+  {{ report_chart_data|json_script:"report-chart-data" }}
+  <div class="chart-bars" id="report-chart-bars" style="margin-top: 0.75rem;"></div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+  <h2 class="section-title" style="padding: 1.25rem 1.25rem 0;">{% if request.LANGUAGE_CODE == 'sw' %}Shughuli za karibuni{% else %}Recent activity{% endif %}</h2>
+  <div class="table-wrap" style="border: none; border-radius: 0; box-shadow: none;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Mauzo{% else %}Sale{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Tarehe{% else %}Date{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Mhudumu{% else %}Staff{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Bidhaa{% else %}Items{% endif %}</th>
+          <th style="text-align: right;">{% if request.LANGUAGE_CODE == 'sw' %}Jumla{% else %}Total{% endif %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in recent_sales %}
+        <tr>
+          <td><a href="{% url 'receipt' s.pk %}">#{{ s.pk }}</a></td>
+          <td class="date-cell">{{ s.created_at|date:"d M Y" }}<br><span class="card-hint">{{ s.created_at|date:"H:i" }}</span></td>
+          <td>{% if s.user %}{{ s.user.username }}{% else %}{% if request.LANGUAGE_CODE == 'sw' %}—{% else %}—{% endif %}{% endif %}</td>
+          <td>{{ s.item_count }}</td>
+          <td style="text-align: right;">TZS {{ s.total|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna mauzo ya kuonyesha bado.{% else %}No sales to show yet.{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const dataEl = document.getElementById("report-chart-data");
+    const barsEl = document.getElementById("report-chart-bars");
+    if (!dataEl || !barsEl) return;
+    let chartData = {};
+    try { chartData = JSON.parse(dataEl.textContent || "{}"); } catch (e) { chartData = {}; }
+    const buttons = document.querySelectorAll(".js-report-range");
+
+    function render(range) {
+      const rows = chartData[range] || [];
+      barsEl.innerHTML = "";
+      let max = 0;
+      rows.forEach((r) => { if (Number(r.value) > max) max = Number(r.value); });
+      rows.forEach((r) => {
+        const pct = max > 0 ? Math.max(4, Math.round((Number(r.value) / max) * 120)) : 4;
+        const wrap = document.createElement("div");
+        wrap.className = "chart-bar-wrap";
+        wrap.innerHTML = '<div class="chart-bar" style="height:' + pct + 'px" title="TZS ' + Number(r.value).toLocaleString("en-TZ", {minimumFractionDigits:2,maximumFractionDigits:2}) + '"></div><span class="chart-bar-label">' + r.label + "</span>";
+        barsEl.appendChild(wrap);
+      });
+      buttons.forEach((b) => b.classList.toggle("btn-primary", b.dataset.range === range));
+      buttons.forEach((b) => b.classList.toggle("btn-secondary", b.dataset.range !== range));
+    }
+
+    buttons.forEach((b) => b.addEventListener("click", () => render(b.dataset.range)));
+    render("daily");
+  })();
+</script>
+{% endblock %}

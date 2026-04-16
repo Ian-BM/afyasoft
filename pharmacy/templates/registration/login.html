@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Afya Soft</title>
+  <link rel="icon" type="image/png" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <link rel="stylesheet" href="{% static 'pharmacy/css/app.css' %}">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <img
+        class="login-brand-logo"
+        src="{% static 'pharmacy/img/afyasoft-logo.png' %}"
+        alt="Afya Soft logo"
+        width="120"
+        height="80"
+        loading="lazy"
+      >
+      <h1>Afya Soft</h1>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Usimamizi wa duka la dawa — ingia kuendelea{% else %}Pharmacy management — sign in to continue{% endif %}</p>
+      <form method="post" action="{% url 'set_language' %}" style="margin-top: 0.75rem; display: inline-flex; gap: 0.4rem;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" name="language" value="{% if request.LANGUAGE_CODE == 'sw' %}en{% else %}sw{% endif %}" class="btn-logout touch-target">
+          {% if request.LANGUAGE_CODE == 'sw' %}EN{% else %}SW{% endif %}
+        </button>
+      </form>
+    </div>
+    <form method="post" action="{% url 'login' %}" class="login-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="message message-error" style="margin-bottom: 1rem;">
+        {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+      </div>
+      {% endif %}
+      <div class="form-row">
+        <label for="id_username">{% if request.LANGUAGE_CODE == 'sw' %}Jina la mtumiaji{% else %}Username{% endif %}</label>
+        <input type="text" name="username" id="id_username" class="input" required autofocus autocomplete="username" value="{{ form.username.value|default:'' }}">
+      </div>
+      <div class="form-row">
+        <label for="id_password">{% if request.LANGUAGE_CODE == 'sw' %}Nenosiri{% else %}Password{% endif %}</label>
+        <input type="password" name="password" id="id_password" class="input" required autocomplete="current-password">
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Sign in{% endif %}</button>
+    </form>
+  </div>
+</body>
+</html>

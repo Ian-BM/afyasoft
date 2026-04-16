@@ -1,0 +1,52 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Risiti #{{ sale.pk }}{% else %}Receipt #{{ sale.pk }}{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Risiti{% else %}Receipt{% endif %}{% endblock %}
+
+{% block content %}
+<div class="receipt">
+  <div class="receipt-header">
+    <h2 style="margin: 0; font-size: 1.25rem; color: var(--sidebar);">Afya Soft</h2>
+    <p style="margin: 0.35rem 0 0; font-size: 0.875rem; color: var(--text-muted);">
+      {% if request.LANGUAGE_CODE == 'sw' %}Duka la dawa · {{ receipt_record.receipt_number|default:"Risiti" }} · Mauzo #{{ sale.pk }}{% else %}Pharmacy · {{ receipt_record.receipt_number|default:"Receipt" }} · Sale #{{ sale.pk }}{% endif %}
+    </p>
+    <p style="margin: 0.5rem 0 0; font-size: 0.8125rem; color: var(--text-muted);">
+      {% if sale.client_recorded_at %}{% if request.LANGUAGE_CODE == 'sw' %}Ilirekodiwa:{% else %}Recorded:{% endif %} {{ sale.client_recorded_at|date:"d M Y · H:i" }} · {% if request.LANGUAGE_CODE == 'sw' %}Ilisawazishwa:{% else %}Synced:{% endif %} {{ sale.created_at|date:"d M Y · H:i" }}
+      {% else %}{{ sale.created_at|date:"d M Y · H:i" }}{% endif %}
+    </p>
+    {% if sale.offline_uuid %}
+    <p style="margin: 0.35rem 0 0; font-size: 0.75rem; color: var(--text-muted);">{% if request.LANGUAGE_CODE == 'sw' %}Namba ya nje ya mtandao:{% else %}Offline ID:{% endif %} {{ sale.offline_uuid }}</p>
+    {% endif %}
+    {% if sale.user %}
+    <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--text-muted);">{% if request.LANGUAGE_CODE == 'sw' %}Mhudumu{% else %}Staff{% endif %}: {{ sale.user.username }}</p>
+    {% endif %}
+  </div>
+
+  <table class="data-table" style="box-shadow: none; border: none;">
+    <thead>
+      <tr><th>{% if request.LANGUAGE_CODE == 'sw' %}Bidhaa{% else %}Item{% endif %}</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Kiasi{% else %}Qty{% endif %}</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Price{% endif %}</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Jumla ndogo{% else %}Subtotal{% endif %}</th></tr>
+    </thead>
+    <tbody>
+      {% for line in sale.items.all %}
+      <tr>
+        <td>{{ line.medicine_name }}</td>
+        <td>{{ line.quantity }}</td>
+        <td>TZS {{ line.unit_price|floatformat:2 }}</td>
+        <td>TZS {{ line.line_total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p style="text-align: right; font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0;">
+    {% if request.LANGUAGE_CODE == 'sw' %}Jumla{% else %}Total{% endif %}: TZS {{ sale.total|floatformat:2 }}
+  </p>
+</div>
+
+<div class="receipt-actions">
+  <a href="{% url 'sales' %}" class="btn btn-primary">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo mapya{% else %}New sale{% endif %}</a>
+  <button type="button" class="btn btn-secondary" onclick="window.print()">{% if request.LANGUAGE_CODE == 'sw' %}Chapisha risiti{% else %}Print receipt{% endif %}</button>
+  <a href="{% url 'receipt_archive' %}" class="btn btn-secondary">{% if request.LANGUAGE_CODE == 'sw' %}Kumbukumbu za risiti{% else %}Receipt archive{% endif %}</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-secondary">{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi{% else %}Dashboard{% endif %}</a>
+</div>
+{% endblock %}

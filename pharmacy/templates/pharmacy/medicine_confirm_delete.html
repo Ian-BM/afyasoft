@@ -1,0 +1,17 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Futa dawa{% else %}Delete medicine{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Futa dawa{% else %}Delete medicine{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <p style="margin: 0 0 1rem;">{% if request.LANGUAGE_CODE == 'sw' %}Ondoa <strong>{{ medicine.name }}</strong> kutoka stoo? Hii haiwezi kurejeshwa kama dawa imeunganishwa na mauzo ya zamani.{% else %}Remove <strong>{{ medicine.name }}</strong> from inventory? This cannot be undone if the item is not linked to past sales.{% endif %}</p>
+  <form method="post">
+    {% csrf_token %}
+    <div style="display: flex; gap: 0.75rem;">
+      <button type="submit" class="btn btn-danger">{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Delete{% endif %}</button>
+      <a href="{% url 'inventory' %}" class="btn btn-secondary">{% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

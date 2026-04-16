@@ -1,0 +1,96 @@
+{% extends "pharmacy/base.html" %}
+{% load static %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Stoo{% else %}Inventory{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Stoo{% else %}Inventory{% endif %}{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <form method="get" action="{% url 'inventory' %}" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+    <input type="search" name="q" class="input" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta kwa jina…{% else %}Search by name…{% endif %}" value="{{ search }}" style="max-width: 260px;">
+    <label style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; color: var(--text-muted); cursor: pointer;">
+      <input type="checkbox" name="low" value="1" {% if low_only %}checked{% endif %} onchange="this.form.submit()">
+      {% if request.LANGUAGE_CODE == 'sw' %}Stoo ndogo tu{% else %}Low stock only{% endif %}
+    </label>
+    <button type="submit" class="btn btn-secondary btn-sm">{% if request.LANGUAGE_CODE == 'sw' %}Chuja{% else %}Filter{% endif %}</button>
+    {% if search or low_only %}
+    <a href="{% url 'inventory' %}" class="link-muted">{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Clear{% endif %}</a>
+    {% endif %}
+  </form>
+  {% if pharmacy_is_admin %}
+  <a href="{% url 'medicine_add' %}" class="btn btn-primary touch-target" style="margin-left: auto;">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa{% else %}Add medicine{% endif %}</a>
+  {% endif %}
+  <a href="{% url 'stock_movements' %}" class="btn btn-secondary btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Mabadiliko ya stoo{% else %}Stock movements{% endif %}</a>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Jina{% else %}Name{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Price{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Kiasi{% else %}Quantity{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mwisho wa muda{% else %}Expiry{% endif %}</th>
+        <th class="cell-actions" style="text-align: right;">{% if request.LANGUAGE_CODE == 'sw' %}Vitendo{% else %}Actions{% endif %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in medicines %}
+      <tr class="{% if m.quantity <= low_stock_threshold %}row-low{% endif %}">
+        <td><strong>{{ m.name }}</strong></td>
+        <td>TZS {{ m.price|floatformat:2 }}</td>
+        <td>
+          {% if m.quantity <= low_stock_threshold %}
+          <span class="badge badge-low">{{ m.quantity }}</span>
+          {% else %}
+          <span class="badge badge-ok">{{ m.quantity }}</span>
+          {% endif %}
+        </td>
+        <td class="date-cell">{{ m.expiry_date|date:"d M Y" }}</td>
+        <td class="cell-actions" style="text-align: right;">
+          {% if pharmacy_is_admin %}
+          <details class="action-menu">
+            <summary class="action-menu-toggle touch-target" aria-label="{% if request.LANGUAGE_CODE == 'sw' %}Fungua vitendo{% else %}Open actions{% endif %}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </summary>
+            <div class="action-menu-list">
+              <a href="{% url 'medicine_edit' m.pk %}" class="action-menu-item">{% if request.LANGUAGE_CODE == 'sw' %}Hariri{% else %}Edit{% endif %}</a>
+              <a href="{% url 'stock_adjust' m.pk %}" class="action-menu-item">{% if request.LANGUAGE_CODE == 'sw' %}Rekebisha{% else %}Adjust{% endif %}</a>
+              <a href="{% url 'stock_expire' m.pk %}" class="action-menu-item">{% if request.LANGUAGE_CODE == 'sw' %}Maliza muda{% else %}Expire{% endif %}</a>
+              <button type="button" class="action-menu-item action-menu-item-danger js-open-delete" data-url="{% url 'medicine_delete' m.pk %}" data-medicine-name="{{ m.name }}">{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Delete{% endif %}</button>
+            </div>
+          </details>
+          {% else %}
+          <span class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Kuangalia tu{% else %}View only{% endif %}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna dawa zilizopatikana.{% else %}No medicines found.{% endif %} {% if pharmacy_is_admin %}<a href="{% url 'medicine_add' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa ya kwanza{% else %}Add your first item{% endif %}</a>.{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if pharmacy_is_admin %}
+<dialog id="delete-dialog" class="modal-dialog" aria-labelledby="delete-dialog-title">
+  <div class="modal-dialog-inner">
+    <h2 id="delete-dialog-title" style="margin: 0 0 0.5rem; font-size: 1.05rem;">{% if request.LANGUAGE_CODE == 'sw' %}Ondoa dawa{% else %}Remove medicine{% endif %}</h2>
+    <p id="delete-dialog-message" style="margin: 0; color: var(--text-muted); font-size: 0.9rem;"></p>
+    <form method="post" id="delete-dialog-form" class="modal-dialog-actions" style="justify-content: flex-end;">
+      {% csrf_token %}
+      <button type="button" class="btn btn-secondary" id="delete-dialog-cancel">{% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}</button>
+      <button type="submit" class="btn btn-danger">{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Delete{% endif %}</button>
+    </form>
+  </div>
+</dialog>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if pharmacy_is_admin %}
+<script src="{% static 'pharmacy/js/inventory.js' %}"></script>
+{% endif %}
+{% endblock %}

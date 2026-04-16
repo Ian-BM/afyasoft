@@ -1,0 +1,25 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Rekodi stoo iliyokwisha muda{% else %}Record expired stock{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Rekodi stoo iliyokwisha muda{% else %}Record expired stock{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <p class="card-hint" style="margin-top: 0;">
+    {% if request.LANGUAGE_CODE == 'sw' %}Ondoa kiasi kilichoisha muda kutoka stoo ya{% else %}Remove expired units from active stock for{% endif %} <strong>{{ medicine.name }}</strong>.
+  </p>
+  <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Kiasi cha sasa{% else %}Current quantity{% endif %}: <strong>{{ medicine.quantity }}</strong></p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-row">
+      <label for="id_quantity">{% if request.LANGUAGE_CODE == 'sw' %}Kiasi kilichoisha muda{% else %}Expired quantity{% endif %}</label>
+      {{ form.quantity }}
+      {{ form.quantity.errors }}
+    </div>
+    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;">
+      <button type="submit" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Hifadhi ukwijaji{% else %}Record expiry{% endif %}</button>
+      <a href="{% url 'inventory' %}" class="btn btn-secondary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

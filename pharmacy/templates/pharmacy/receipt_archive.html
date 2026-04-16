@@ -1,0 +1,47 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Kumbukumbu za risiti{% else %}Receipt archive{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Kumbukumbu za risiti{% else %}Receipt archive{% endif %}{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <form method="get" action="{% url 'receipt_archive' %}" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+    <input type="search" name="q" class="input" value="{{ request.GET.q|default:'' }}" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta namba ya risiti, mauzo au mtumiaji…{% else %}Search receipt #, sale #, or staff username…{% endif %}">
+    <button type="submit" class="btn btn-secondary btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}</button>
+    <a href="{% url 'receipt_archive' %}" class="link-muted">{% if request.LANGUAGE_CODE == 'sw' %}Anza upya{% else %}Reset{% endif %}</a>
+  </form>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Namba ya risiti{% else %}Receipt #{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Tarehe{% else %}Date{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mhudumu{% else %}Staff{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mauzo{% else %}Sale{% endif %}</th>
+        <th style="text-align: right;">{% if request.LANGUAGE_CODE == 'sw' %}Jumla{% else %}Total{% endif %}</th>
+        <th style="text-align: right;">{% if request.LANGUAGE_CODE == 'sw' %}Kitendo{% else %}Action{% endif %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in receipts %}
+      <tr>
+        <td><strong>{{ r.receipt_number }}</strong></td>
+        <td class="date-cell">{{ r.issued_at|date:"d M Y" }}<br><span class="card-hint">{{ r.issued_at|date:"H:i" }}</span></td>
+        <td>{% if r.sale.user %}{{ r.sale.user.username }}{% else %}—{% endif %}</td>
+        <td>#{{ r.sale_id }}</td>
+        <td style="text-align: right;">TZS {{ r.sale.total|floatformat:2 }}</td>
+        <td style="text-align: right;">
+          <a href="{% url 'receipt_by_number' r.receipt_number %}" class="btn btn-ghost btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Fungua / chapa tena{% else %}Open / reprint{% endif %}</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna risiti zilizohifadhiwa.{% else %}No stored receipts found.{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

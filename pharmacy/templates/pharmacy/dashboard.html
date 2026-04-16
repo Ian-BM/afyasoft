@@ -1,0 +1,110 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi{% else %}Dashboard{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi{% else %}Dashboard{% endif %}{% endblock %}
+
+{% block content %}
+<div class="grid-cards">
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo ya leo{% else %}Today’s sales{% endif %}</p>
+      <p class="card-value">TZS {{ sales_total|floatformat:2 }}</p>
+      <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Mapato ya siku ya leo{% else %}Total revenue for the current day{% endif %}</p>
+    </div>
+    <div class="card-metric-icon" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+  </div>
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Miamala{% else %}Transactions{% endif %}</p>
+      <p class="card-value">{{ txn_count }}</p>
+      <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo yaliyokamilika leo{% else %}Completed sales today{% endif %}</p>
+    </div>
+    <div class="card-metric-icon" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+    </div>
+  </div>
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Stoo ndogo{% else %}Low stock{% endif %}</p>
+      <p class="card-value">{{ low_stock_count }}</p>
+      <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Bidhaa zilizo chini au sawa na {{ low_stock_threshold }}{% else %}Items at or below {{ low_stock_threshold }} units{% endif %}</p>
+    </div>
+    <div class="card-metric-icon warning" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+  </div>
+  <div class="card card-metric">
+    <div>
+      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa ukwijaji{% else %}Expiry watch{% endif %}</p>
+      <p class="card-value">{{ expiring_soon_count }}</p>
+      <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Bidhaa zitakazokwisha muda ndani ya kipindi{% else %}SKUs expiring within monitoring window{% endif %}</p>
+    </div>
+    <div class="card-metric-icon danger" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+  </div>
+</div>
+
+<div class="card chart-card">
+  <h2 class="chart-title">{% if request.LANGUAGE_CODE == 'sw' %}Mwelekeo wa mauzo (siku 7 zilizopita){% else %}Sales trend (last 7 days){% endif %}</h2>
+  <div class="chart-bars" role="img" aria-label="Bar chart of daily sales totals">
+    {% for bar in chart_bars %}
+    <div class="chart-bar-wrap">
+      <div class="chart-bar" style="height: {{ bar.px }}px;" title="TZS {{ bar.value|floatformat:2 }}"></div>
+      <span class="chart-bar-label">{{ bar.label }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid-cards grid-cards-split">
+  <div class="card">
+    <h2 class="section-title">{% if request.LANGUAGE_CODE == 'sw' %}Tahadhari ya stoo ndogo{% else %}Low stock alerts{% endif %}</h2>
+    {% if low_stock_items %}
+    <div class="table-wrap" style="border: none; box-shadow: none;">
+      <table class="data-table">
+        <thead>
+          <tr><th>{% if request.LANGUAGE_CODE == 'sw' %}Dawa{% else %}Medicine{% endif %}</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Kiasi{% else %}Qty{% endif %}</th></tr>
+        </thead>
+        <tbody>
+          {% for m in low_stock_items %}
+          <tr class="{% if m.quantity <= low_stock_threshold %}row-low{% endif %}">
+            <td><strong>{{ m.name }}</strong></td>
+            <td><span class="badge badge-low">{{ m.quantity }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p style="margin: 0.75rem 0 0;"><a class="link-muted" href="{% url 'inventory' %}?low=1">{% if request.LANGUAGE_CODE == 'sw' %}Ona zote zilizo na stoo ndogo →{% else %}View all low-stock items →{% endif %}</a></p>
+    {% else %}
+    <p class="empty-state" style="padding: 1rem 0;">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna dawa zenye stoo ndogo kwa sasa.{% else %}No low-stock items right now.{% endif %}</p>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="section-title">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo ya karibuni{% else %}Recent sales{% endif %}</h2>
+    {% if recent_sales %}
+    <div class="table-wrap" style="border: none; box-shadow: none;">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Muda{% else %}Time{% endif %}</th><th>{% if request.LANGUAGE_CODE == 'sw' %}Jumla{% else %}Total{% endif %}</th></tr>
+        </thead>
+        <tbody>
+          {% for s in recent_sales %}
+          <tr>
+            <td><a href="{% url 'receipt' s.pk %}">#{{ s.pk }}</a></td>
+            <td class="date-cell">{{ s.created_at|date:"d M Y" }}<br><span class="card-hint">{{ s.created_at|date:"H:i" }}</span></td>
+            <td>TZS {{ s.total|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty-state" style="padding: 1rem 0;">{% if request.LANGUAGE_CODE == 'sw' %}Bado hakuna mauzo yaliyorekodiwa.{% else %}No sales recorded yet.{% endif %}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

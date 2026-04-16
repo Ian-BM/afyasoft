@@ -1,0 +1,17 @@
+{
+  "name": "Afya Soft Pharmacy",
+  "short_name": "Afya Soft",
+  "description": "Pharmacy management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#1a365d",
+  "icons": [
+    {
+      "src": "/static/pharmacy/img/afyasoft-logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

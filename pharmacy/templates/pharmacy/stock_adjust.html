@@ -1,0 +1,29 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Marekebisho ya stoo{% else %}Stock adjustment{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Marekebisho ya stoo{% else %}Stock adjustment{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <p class="card-hint" style="margin-top: 0;">
+    {% if request.LANGUAGE_CODE == 'sw' %}Rekebisho ya stoo kwa{% else %}Manual stock correction for{% endif %} <strong>{{ medicine.name }}</strong>.
+    {% if request.LANGUAGE_CODE == 'sw' %}Tumia namba chanya kuongeza stoo, hasi kupunguza.{% else %}Use a positive number to add stock, negative to reduce.{% endif %}
+  </p>
+  <p class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Kiasi cha sasa{% else %}Current quantity{% endif %}: <strong>{{ medicine.quantity }}</strong></p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-row">
+      <label for="id_quantity_change">{% if request.LANGUAGE_CODE == 'sw' %}Mabadiliko ya kiasi{% else %}Quantity change{% endif %}</label>
+      {{ form.quantity_change }}
+      {{ form.quantity_change.errors }}
+      {% if form.quantity_change.help_text %}
+      <p class="card-hint" style="margin: 0.35rem 0 0;">{{ form.quantity_change.help_text }}</p>
+      {% endif %}
+    </div>
+    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;">
+      <button type="submit" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Hifadhi marekebisho{% else %}Save adjustment{% endif %}</button>
+      <a href="{% url 'inventory' %}" class="btn btn-secondary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ghairi{% else %}Cancel{% endif %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

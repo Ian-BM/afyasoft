@@ -1,0 +1,78 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Wafanyakazi{% else %}Team{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Timu na wafanyakazi{% else %}Team &amp; workers{% endif %}{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <p class="card-hint" style="margin: 0; flex: 1;">{% if request.LANGUAGE_CODE == 'sw' %}Admin pekee anaweza kusimamia watumiaji. Ukizima meneja, wafanyakazi wake waliohusishwa pia huzimwa moja kwa moja.{% else %}Only admin can manage users. If a manager is deactivated, linked workers are also deactivated automatically.{% endif %}</p>
+  <a href="{% url 'staff_add' %}" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza mtumiaji{% else %}Add user{% endif %}</a>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Jina la mtumiaji{% else %}Username{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Nafasi{% else %}Role{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Anasimamiwa na{% else %}Managed by{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Hali{% else %}Status{% endif %}</th>
+        <th>Email</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Hatua{% else %}Action{% endif %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in staff_users %}
+      <tr>
+        <td><strong>{{ u.username }}</strong></td>
+        <td>
+          {% if u.pharmacy_profile.role == 'admin' %}
+          <span class="badge badge-expiry-notice">{% if request.LANGUAGE_CODE == 'sw' %}Msimamizi{% else %}Administrator{% endif %}</span>
+          {% elif u.pharmacy_profile.role == 'manager' %}
+          <span class="badge badge-expiry-warning">{% if request.LANGUAGE_CODE == 'sw' %}Meneja / Mmiliki{% else %}Manager / Owner{% endif %}</span>
+          {% else %}
+          <span class="badge badge-ok">{% if request.LANGUAGE_CODE == 'sw' %}Mfanyakazi{% else %}Worker{% endif %}</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if u.pharmacy_profile.manager %}
+            {{ u.pharmacy_profile.manager.username }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if u.is_active %}
+          <span class="badge badge-ok">{% if request.LANGUAGE_CODE == 'sw' %}Hai{% else %}Active{% endif %}</span>
+          {% else %}
+          <span class="badge badge-expiry-critical">{% if request.LANGUAGE_CODE == 'sw' %}Imezimwa{% else %}Inactive{% endif %}</span>
+          {% endif %}
+        </td>
+        <td>{{ u.email|default:"—" }}</td>
+        <td>
+          {% if u != request.user %}
+          <form method="post" action="{% url 'staff_toggle_active' u.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="{% if u.is_active %}deactivate{% else %}activate{% endif %}">
+            <button type="submit" class="btn {% if u.is_active %}btn-danger{% else %}btn-secondary{% endif %} touch-target">
+              {% if u.is_active %}
+                {% if request.LANGUAGE_CODE == 'sw' %}Zima{% else %}Deactivate{% endif %}
+              {% else %}
+                {% if request.LANGUAGE_CODE == 'sw' %}Washa{% else %}Activate{% endif %}
+              {% endif %}
+            </button>
+          </form>
+          {% else %}
+          <span class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Akaunti yako{% else %}Your account{% endif %}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna watumiaji waliopatikana.{% else %}No users found.{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

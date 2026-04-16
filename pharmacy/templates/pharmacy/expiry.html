@@ -1,0 +1,54 @@
+{% extends "pharmacy/base.html" %}
+
+{% block title %}{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa ukwijaji{% else %}Expiry tracking{% endif %}{% endblock %}
+{% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa ukwijaji{% else %}Expiry tracking{% endif %}{% endblock %}
+
+{% block content %}
+<p class="card-hint" style="margin: -0.5rem 0 1rem;">{% if request.LANGUAGE_CODE == 'sw' %}Bidhaa zinazoisha muda ndani ya kipindi cha ufuatiliaji. Leo: <strong>{{ today|date:"d M Y" }}</strong>.{% else %}Items expiring on or before the monitoring horizon. Today: <strong>{{ today|date:"d M Y" }}</strong>.{% endif %}</p>
+
+<div class="toolbar">
+  <form method="get" action="{% url 'expiry' %}" style="display: flex; gap: 0.5rem; align-items: center;">
+    <input type="search" name="q" class="input" placeholder="{% if request.LANGUAGE_CODE == 'sw' %}Tafuta kwa jina…{% else %}Search by name…{% endif %}" value="{{ search }}" style="max-width: 260px;">
+    <button type="submit" class="btn btn-secondary btn-sm">{% if request.LANGUAGE_CODE == 'sw' %}Tafuta{% else %}Search{% endif %}</button>
+  </form>
+</div>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Dawa{% else %}Medicine{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Tarehe ya ukwijaji{% else %}Expiry date{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Stoo{% else %}Stock{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Hali{% else %}Status{% endif %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in items %}
+      {% with m=row.medicine %}
+      <tr class="{% if row.level == 'expired' %}row-expired{% elif row.level == 'critical' %}row-low{% endif %}">
+        <td><strong>{{ m.name }}</strong></td>
+        <td class="date-cell">{{ m.expiry_date|date:"d M Y" }}</td>
+        <td>{{ m.quantity }}</td>
+        <td>
+          {% if row.level == 'expired' %}
+          <span class="badge badge-expiry-expired">{% if request.LANGUAGE_CODE == 'sw' %}Imekwisha muda{% else %}Expired{% endif %}</span>
+          {% elif row.level == 'critical' %}
+          <span class="badge badge-expiry-critical">{% if request.LANGUAGE_CODE == 'sw' %}≤ siku 30{% else %}≤ 30 days{% endif %}</span>
+          {% elif row.level == 'warning' %}
+          <span class="badge badge-expiry-warning">{% if request.LANGUAGE_CODE == 'sw' %}siku 31–60{% else %}31–60 days{% endif %}</span>
+          {% else %}
+          <span class="badge badge-expiry-notice">{% if request.LANGUAGE_CODE == 'sw' %}&gt; siku 60{% else %}&gt; 60 days{% endif %}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endwith %}
+      {% empty %}
+      <tr>
+        <td colspan="4" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna bidhaa ndani ya kipindi cha ukwijaji.{% else %}No items in the expiry window.{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
