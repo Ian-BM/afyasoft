@@ -46,9 +46,11 @@
             height="40"
             loading="lazy"
           >
-          <p class="sidebar-brand-title">Afya Soft</p>
+          <p class="sidebar-brand-title">{{ pharmacy_name|default:"Afya Soft" }}</p>
         </div>
-        <p class="sidebar-brand-sub">{% if request.LANGUAGE_CODE == 'sw' %}Usimamizi wa duka la dawa{% else %}Pharmacy management{% endif %}</p>
+        <p class="sidebar-brand-sub">
+          {% if request.LANGUAGE_CODE == 'sw' %}Habari {{ pharmacy_display_name }}{% else %}Hello {{ pharmacy_display_name }}{% endif %}
+        </p>
       </div>
       <nav class="sidebar-nav">
         {% with n=request.resolver_match.url_name %}
@@ -82,12 +84,20 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>{% if request.LANGUAGE_CODE == 'sw' %}Ripoti{% else %}Reports{% endif %}</span>
         </a>
-        {% if pharmacy_is_admin %}
+        {% if pharmacy_can_manage_staff %}
         <a class="nav-link {% if n == 'staff_list' or n == 'staff_add' %}active{% endif %}" href="{% url 'staff_list' %}">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>{% if request.LANGUAGE_CODE == 'sw' %}Wafanyakazi{% else %}Team{% endif %}</span>
         </a>
         {% endif %}
+        <div class="nav-subtle-info">
+          <span>{% if request.LANGUAGE_CODE == 'sw' %}Siku za usajili zilizobaki{% else %}Subscription days left{% endif %}</span>
+          <strong>{{ pharmacy_days_remaining }}</strong>
+        </div>
+        <button type="button" id="theme-toggle" class="nav-link nav-theme-toggle touch-target" aria-label="Toggle theme">
+          <span id="theme-toggle-icon" aria-hidden="true">🌙</span>
+          <span id="theme-toggle-label">Dark</span>
+        </button>
         {% endwith %}
       </nav>
     </aside>
@@ -100,10 +110,6 @@
           <h1 class="topbar-page">{% block page_heading %}Afya Soft{% endblock %}</h1>
         </div>
         <div class="topbar-user">
-          <button type="button" id="theme-toggle" class="btn-logout touch-target" aria-label="Toggle theme">
-            <span id="theme-toggle-icon" aria-hidden="true">🌙</span>
-            <span id="theme-toggle-label">Dark</span>
-          </button>
           <span id="pending-sync-badge" class="pending-sync-badge" title="{% if request.LANGUAGE_CODE == 'sw' %}Mauzo yanayosubiri kusawazishwa{% else %}Sales waiting to sync{% endif %}" aria-label="{% if request.LANGUAGE_CODE == 'sw' %}Hakuna mauzo yanayosubiri{% else %}No pending sales{% endif %}"></span>
           <span class="role-pill" title="{% if request.LANGUAGE_CODE == 'sw' %}Nafasi yako{% else %}Your role{% endif %}">
             {% if pharmacy_role == 'admin' %}{% if request.LANGUAGE_CODE == 'sw' %}Msimamizi{% else %}Admin{% endif %}

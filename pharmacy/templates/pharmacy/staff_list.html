@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="toolbar">
-  <p class="card-hint" style="margin: 0; flex: 1;">{% if request.LANGUAGE_CODE == 'sw' %}Admin pekee anaweza kusimamia watumiaji. Ukizima meneja, wafanyakazi wake waliohusishwa pia huzimwa moja kwa moja.{% else %}Only admin can manage users. If a manager is deactivated, linked workers are also deactivated automatically.{% endif %}</p>
+  <p class="card-hint" style="margin: 0; flex: 1;">{% if request.LANGUAGE_CODE == 'sw' %}Admin na meneja wanaweza kuongeza wafanyakazi. Mabadiliko ya kuwasha/kuzima akaunti ni ya admin pekee.{% else %}Admin and managers can add workers. Account activate/deactivate controls are admin-only.{% endif %}</p>
   <a href="{% url 'staff_add' %}" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza mtumiaji{% else %}Add user{% endif %}</a>
 </div>
 
@@ -18,7 +18,10 @@
         <th>{% if request.LANGUAGE_CODE == 'sw' %}Anasimamiwa na{% else %}Managed by{% endif %}</th>
         <th>{% if request.LANGUAGE_CODE == 'sw' %}Hali{% else %}Status{% endif %}</th>
         <th>Email</th>
-        <th>{% if request.LANGUAGE_CODE == 'sw' %}Hatua{% else %}Action{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Mteja{% else %}Client{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Duka la dawa{% else %}Pharmacy{% endif %}</th>
+        <th>{% if request.LANGUAGE_CODE == 'sw' %}Siku zilizobaki{% else %}Days left{% endif %}</th>
+        {% if pharmacy_is_admin %}<th>{% if request.LANGUAGE_CODE == 'sw' %}Hatua{% else %}Action{% endif %}</th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -48,7 +51,10 @@
           <span class="badge badge-expiry-critical">{% if request.LANGUAGE_CODE == 'sw' %}Imezimwa{% else %}Inactive{% endif %}</span>
           {% endif %}
         </td>
-        <td>{{ u.email|default:"—" }}</td>
+        <td>{{ u.pharmacy_profile.client_name|default:"—" }}</td>
+        <td>{{ u.pharmacy_profile.pharmacy_name|default:"—" }}</td>
+        <td>{{ u.pharmacy_profile.subscription_days_remaining }}</td>
+        {% if pharmacy_is_admin %}
         <td>
           {% if u != request.user %}
           <form method="post" action="{% url 'staff_toggle_active' u.id %}">
@@ -66,10 +72,11 @@
           <span class="card-hint">{% if request.LANGUAGE_CODE == 'sw' %}Akaunti yako{% else %}Your account{% endif %}</span>
           {% endif %}
         </td>
+        {% endif %}
       </tr>
       {% empty %}
       <tr>
-        <td colspan="6" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna watumiaji waliopatikana.{% else %}No users found.{% endif %}</td>
+        <td colspan="{% if pharmacy_is_admin %}9{% else %}8{% endif %}" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna watumiaji waliopatikana.{% else %}No users found.{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

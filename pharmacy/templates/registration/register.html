@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if request.LANGUAGE_CODE == 'sw' %}Jisajili · Afya Soft{% else %}Register · Afya Soft{% endif %}</title>
+  <link rel="icon" type="image/png" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <link rel="stylesheet" href="{% static 'pharmacy/css/app.css' %}">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <img class="login-brand-logo" src="{% static 'pharmacy/img/afyasoft-logo.png' %}" alt="Afya Soft logo" width="120" height="80" loading="lazy">
+      <h1>Afya Soft</h1>
+      <p>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          Sajili duka lako la dawa ili uanze kutumia mfumo.
+        {% else %}
+          Register your pharmacy and start using the system.
+        {% endif %}
+      </p>
+    </div>
+    <form method="post" class="login-form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="message message-error" style="margin-bottom: 1rem;">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {% for field in form %}
+      <div class="form-row">
+        <label for="{{ field.id_for_label }}">
+          {% if request.LANGUAGE_CODE == 'sw' %}
+            {% if field.name == 'pharmacy_name' %}Jina la duka la dawa{% elif field.name == 'client_name' %}Jina la mteja{% elif field.name == 'username' %}Jina la mtumiaji{% elif field.name == 'email' %}Barua pepe (si lazima){% elif field.name == 'password1' %}Nenosiri{% elif field.name == 'password2' %}Thibitisha nenosiri{% else %}{{ field.label }}{% endif %}
+          {% else %}
+            {% if field.name == 'pharmacy_name' %}Pharmacy name{% elif field.name == 'client_name' %}Client name{% elif field.name == 'password1' %}Password{% elif field.name == 'password2' %}Confirm password{% else %}{{ field.label }}{% endif %}
+          {% endif %}
+        </label>
+        {{ field }}
+        {{ field.errors }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">{% if request.LANGUAGE_CODE == 'sw' %}Jisajili{% else %}Register{% endif %}</button>
+      <p class="card-hint" style="text-align: center; margin-top: 0.85rem;">
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          Tayari una akaunti? <a href="{% url 'login' %}">Ingia</a>
+        {% else %}
+          Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        {% endif %}
+      </p>
+    </form>
+  </div>
+</body>
+</html>

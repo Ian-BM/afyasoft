@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
@@ -80,11 +81,26 @@ class AddWorkerForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop("current_user", None)
         super().__init__(*args, **kwargs)
-        self.fields["manager"].queryset = User.objects.filter(
+        manager_qs = User.objects.filter(
             is_active=True,
             pharmacy_profile__role=UserProfile.Role.MANAGER,
-        ).order_by("username")
+        )
+        if self.current_user and getattr(self.current_user, "pharmacy_profile", None):
+            pharmacy_name = (self.current_user.pharmacy_profile.pharmacy_name or "").strip()
+            if pharmacy_name:
+                manager_qs = manager_qs.filter(pharmacy_profile__pharmacy_name=pharmacy_name)
+            if self.current_user.pharmacy_profile.role == UserProfile.Role.MANAGER:
+                self.fields["role"].choices = [(UserProfile.Role.WORKER, "Worker")]
+                self.fields["role"].initial = UserProfile.Role.WORKER
+                self.fields["manager"].queryset = User.objects.filter(pk=self.current_user.pk)
+                self.fields["manager"].initial = self.current_user
+                self.fields["manager"].widget = forms.HiddenInput()
+            else:
+                self.fields["manager"].queryset = manager_qs.order_by("username")
+        else:
+            self.fields["manager"].queryset = manager_qs.order_by("username")
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()
@@ -99,6 +115,56 @@ class AddWorkerForm(forms.Form):
             raise ValidationError("The two password fields do not match.")
         if data.get("role") != UserProfile.Role.WORKER:
             data["manager"] = None
+        return data
+
+
+class ClientRegistrationForm(forms.Form):
+    pharmacy_name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={"class": "input", "placeholder": "Pharmacy name", "autocomplete": "organization"}
+        ),
+    )
+    client_name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={"class": "input", "placeholder": "Your full name", "autocomplete": "name"}
+        ),
+    )
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={"class": "input", "placeholder": "Username", "autocomplete": "username"}
+        ),
+    )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={"class": "input", "placeholder": "Email (optional)"}),
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"class": "input", "placeholder": "Password", "autocomplete": "new-password"}
+        )
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"class": "input", "placeholder": "Confirm password", "autocomplete": "new-password"}
+        )
+    )
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if User.objects.filter(username=username).exists():
+            raise ValidationError("That username is already in use.")
+        return username
+
+    def clean(self):
+        data = super().clean()
+        p1, p2 = data.get("password1"), data.get("password2")
+        if p1 and p2 and p1 != p2:
+            raise ValidationError("The two password fields do not match.")
+        if p1:
+            validate_password(p1)
         return data
 
 

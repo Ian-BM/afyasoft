@@ -47,6 +47,13 @@
       </div>
       <input type="hidden" name="next" value="{{ next }}">
       <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Sign in{% endif %}</button>
+      <p class="card-hint" style="text-align: center; margin-top: 0.85rem;">
+        {% if request.LANGUAGE_CODE == 'sw' %}
+          Huna akaunti? <a href="{% url 'register' %}">Jisajili</a>
+        {% else %}
+          New client? <a href="{% url 'register' %}">Create an account</a>
+        {% endif %}
+      </p>
     </form>
   </div>
 </body>

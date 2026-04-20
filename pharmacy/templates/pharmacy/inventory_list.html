@@ -17,10 +17,12 @@
     <a href="{% url 'inventory' %}" class="link-muted">{% if request.LANGUAGE_CODE == 'sw' %}Futa{% else %}Clear{% endif %}</a>
     {% endif %}
   </form>
-  {% if pharmacy_is_admin %}
+  {% if pharmacy_can_add_medicine %}
   <a href="{% url 'medicine_add' %}" class="btn btn-primary touch-target" style="margin-left: auto;">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa{% else %}Add medicine{% endif %}</a>
   {% endif %}
+  {% if pharmacy_is_admin %}
   <a href="{% url 'stock_movements' %}" class="btn btn-secondary btn-sm touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Mabadiliko ya stoo{% else %}Stock movements{% endif %}</a>
+  {% endif %}
 </div>
 
 <div class="table-wrap">
@@ -67,7 +69,7 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna dawa zilizopatikana.{% else %}No medicines found.{% endif %} {% if pharmacy_is_admin %}<a href="{% url 'medicine_add' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa ya kwanza{% else %}Add your first item{% endif %}</a>.{% endif %}</td>
+        <td colspan="5" class="empty-state">{% if request.LANGUAGE_CODE == 'sw' %}Hakuna dawa zilizopatikana.{% else %}No medicines found.{% endif %} {% if pharmacy_can_add_medicine %}<a href="{% url 'medicine_add' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa ya kwanza{% else %}Add your first item{% endif %}</a>.{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

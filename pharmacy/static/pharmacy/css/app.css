@@ -203,6 +203,38 @@ a:hover {
   opacity: 1;
 }
 
+.nav-subtle-info {
+  margin: 0.55rem 0.2rem 0.45rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.nav-subtle-info strong {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.nav-theme-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-theme-toggle span[id="theme-toggle-icon"] {
+  width: 1.1rem;
+  display: inline-flex;
+  justify-content: center;
+}
+
 .main-wrap {
   flex: 1;
   margin-left: var(--sidebar-w);
@@ -1283,6 +1315,10 @@ body.drawer-open {
 
   .topbar-user {
     gap: 0.35rem 0.5rem;
+  }
+
+  .nav-subtle-info {
+    margin-top: 0.4rem;
   }
 
   .sidebar {

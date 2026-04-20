@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("register/", views.register_client, name="register"),
     path("sw.js", views.service_worker, name="service_worker"),
     path("api/sync-sale/", views.sync_sale, name="sync_sale"),
     path("", views.dashboard, name="dashboard"),
@@ -23,5 +24,4 @@ urlpatterns = [
     path("staff/", views.staff_list, name="staff_list"),
     path("staff/add/", views.staff_add, name="staff_add"),
     path("staff/<int:user_id>/status/", views.staff_toggle_active, name="staff_toggle_active"),
-    path("subscription/renew/", views.subscription_renew, name="subscription_renew"),
 ]

@@ -5,6 +5,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login as auth_login
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -18,6 +19,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import (
     AddWorkerForm,
+    ClientRegistrationForm,
     ExpiryWriteoffForm,
     MedicineForm,
     ReceiptFilterForm,
@@ -25,8 +27,13 @@ from .forms import (
     StockAdjustmentForm,
     StockMovementFilterForm,
 )
-from .models import Medicine, PharmacySubscription, Receipt, Sale, StockMovement, UserProfile
-from .permissions import is_pharmacy_admin, pharmacy_admin_required
+from .models import Medicine, Receipt, Sale, StockMovement, UserProfile
+from .permissions import (
+    is_pharmacy_admin,
+    is_pharmacy_manager,
+    pharmacy_admin_required,
+    pharmacy_staff_manager_required,
+)
 from .services import apply_stock_change, complete_sale, parse_offline_uuid
 
 User = get_user_model()
@@ -44,18 +51,6 @@ def _expiry_warning_days():
     return getattr(settings, "PHARMACY_EXPIRY_WARNING_DAYS", 90)
 
 
-def _ensure_subscription():
-    subscription, _ = PharmacySubscription.objects.get_or_create(
-        pk=1,
-        defaults={
-            "started_on": timezone.localdate(),
-            "duration_days": 30,
-            "is_active": True,
-        },
-    )
-    return subscription
-
-
 def service_worker(request):
     path = Path(__file__).resolve().parent / "static" / "pharmacy" / "sw.js"
     return HttpResponse(path.read_text(encoding="utf-8"), content_type="application/javascript")
@@ -64,7 +59,6 @@ def service_worker(request):
 @login_required
 def dashboard(request):
     if is_pharmacy_admin(request.user):
-        subscription = _ensure_subscription()
         staff_users = User.objects.select_related("pharmacy_profile", "pharmacy_profile__manager").order_by(
             "username"
         )
@@ -72,7 +66,6 @@ def dashboard(request):
             request,
             "pharmacy/admin_dashboard.html",
             {
-                "subscription": subscription,
                 "staff_users": staff_users,
                 "total_users": staff_users.count(),
                 "active_users": staff_users.filter(is_active=True).count(),
@@ -80,6 +73,8 @@ def dashboard(request):
                 "worker_count": staff_users.filter(pharmacy_profile__role=UserProfile.Role.WORKER).count(),
             },
         )
+
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     today = timezone.localdate()
     start = timezone.make_aware(datetime.combine(today, time.min))
@@ -136,6 +131,8 @@ def dashboard(request):
             "chart_bars": chart_bars,
             "recent_sales": recent_sales,
             "low_stock_threshold": _low_stock_threshold(),
+            "client_name": profile.client_name or request.user.username,
+            "pharmacy_name": profile.pharmacy_name or "Afya Soft",
         },
     )
 
@@ -394,7 +391,6 @@ def stock_movements(request):
 
 
 @login_required
-@pharmacy_admin_required
 def medicine_add(request):
     if request.method == "POST":
         form = MedicineForm(request.POST)
@@ -630,39 +626,49 @@ def reports(request):
 
 
 @login_required
-@pharmacy_admin_required
+@pharmacy_staff_manager_required
 def staff_list(request):
-    staff_users = User.objects.select_related("pharmacy_profile", "pharmacy_profile__manager").order_by(
-        "username"
-    )
-    subscription = _ensure_subscription()
+    staff_users = User.objects.select_related("pharmacy_profile", "pharmacy_profile__manager")
+    if is_pharmacy_manager(request.user):
+        staff_users = staff_users.filter(
+            Q(pk=request.user.pk) | Q(pharmacy_profile__manager=request.user)
+        )
+    staff_users = staff_users.order_by("username")
     return render(
         request,
         "pharmacy/staff_list.html",
         {
             "staff_users": staff_users,
-            "subscription": subscription,
         },
     )
 
 
 @login_required
-@pharmacy_admin_required
+@pharmacy_staff_manager_required
 def staff_add(request):
     if request.method == "POST":
-        form = AddWorkerForm(request.POST)
+        form = AddWorkerForm(request.POST, current_user=request.user)
         if form.is_valid():
+            role = form.cleaned_data["role"]
+            if is_pharmacy_manager(request.user):
+                role = UserProfile.Role.WORKER
             user = User.objects.create_user(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password1"],
                 email=form.cleaned_data.get("email") or "",
             )
             profile, _ = UserProfile.objects.get_or_create(user=user)
-            profile.role = form.cleaned_data["role"]
+            profile.role = role
             profile.manager = form.cleaned_data.get("manager")
             if profile.role != UserProfile.Role.WORKER:
                 profile.manager = None
-            profile.save(update_fields=["role", "manager"])
+            creator_profile = getattr(request.user, "pharmacy_profile", None)
+            if creator_profile and creator_profile.pharmacy_name:
+                profile.pharmacy_name = creator_profile.pharmacy_name
+            if is_pharmacy_manager(request.user):
+                profile.manager = request.user
+            profile.client_name = form.cleaned_data["username"]
+            profile.save(update_fields=["role", "manager", "pharmacy_name", "client_name"])
             messages.success(
                 request,
                 _tr(
@@ -673,7 +679,7 @@ def staff_add(request):
             )
             return redirect("staff_list")
     else:
-        form = AddWorkerForm()
+        form = AddWorkerForm(current_user=request.user)
     return render(
         request,
         "pharmacy/staff_add.html",
@@ -755,21 +761,45 @@ def staff_toggle_active(request, user_id):
     return redirect("staff_list")
 
 
-@login_required
-@pharmacy_admin_required
-@require_POST
-def subscription_renew(request):
-    subscription = _ensure_subscription()
-    subscription.started_on = timezone.localdate()
-    subscription.duration_days = 30
-    subscription.is_active = True
-    subscription.save(update_fields=["started_on", "duration_days", "is_active"])
-    messages.success(
-        request,
-        _tr(
-            request,
-            "Subscription renewed for 30 days.",
-            "Usajili umeongezwa kwa siku 30.",
-        ),
-    )
-    return redirect("dashboard")
+def register_client(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    if request.method == "POST":
+        form = ClientRegistrationForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password1"],
+                email=form.cleaned_data.get("email") or "",
+                first_name=form.cleaned_data["client_name"],
+            )
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile.role = UserProfile.Role.MANAGER
+            profile.client_name = form.cleaned_data["client_name"].strip()
+            profile.pharmacy_name = form.cleaned_data["pharmacy_name"].strip()
+            profile.subscription_started_on = timezone.localdate()
+            profile.subscription_duration_days = 30
+            profile.manager = None
+            profile.save(
+                update_fields=[
+                    "role",
+                    "client_name",
+                    "pharmacy_name",
+                    "subscription_started_on",
+                    "subscription_duration_days",
+                    "manager",
+                ]
+            )
+            auth_login(request, user)
+            messages.success(
+                request,
+                _tr(
+                    request,
+                    f"Welcome {profile.client_name}. Your pharmacy {profile.pharmacy_name} is ready.",
+                    f"Karibu {profile.client_name}. Duka lako la dawa {profile.pharmacy_name} lipo tayari.",
+                ),
+            )
+            return redirect("dashboard")
+    else:
+        form = ClientRegistrationForm()
+    return render(request, "registration/register.html", {"form": form})

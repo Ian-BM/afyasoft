@@ -39,9 +39,9 @@ class ReceiptAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "role", "manager")
-    list_filter = ("role", "manager")
-    search_fields = ("user__username",)
+    list_display = ("user", "role", "pharmacy_name", "client_name", "manager")
+    list_filter = ("role", "manager", "subscription_started_on")
+    search_fields = ("user__username", "pharmacy_name", "client_name")
 
 
 @admin.register(StockMovement)

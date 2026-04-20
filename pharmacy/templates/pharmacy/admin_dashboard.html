@@ -23,43 +23,6 @@
   </article>
 </section>
 
-<section class="card" style="margin-bottom: 1rem;">
-  <div class="toolbar" style="margin-bottom: 0.5rem;">
-    <h2 class="section-title" style="margin: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Usajili wa duka la dawa{% else %}Pharmacy subscription{% endif %}</h2>
-    <form method="post" action="{% url 'subscription_renew' %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Ongeza siku 30{% else %}Renew 30 days{% endif %}</button>
-    </form>
-  </div>
-  <p class="card-hint" style="margin-top: 0;">
-    {% if request.LANGUAGE_CODE == 'sw' %}
-      Mfumo huu unaangalia siku zilizobaki kulingana na usajili wa siku 30.
-    {% else %}
-      The system tracks remaining days using a 30-day subscription window.
-    {% endif %}
-  </p>
-  <div class="grid-cards" style="margin-bottom: 0;">
-    <article class="card">
-      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Siku zilizosalia{% else %}Days remaining{% endif %}</p>
-      <p class="card-value">{{ subscription.days_remaining }}</p>
-    </article>
-    <article class="card">
-      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Mwisho wa usajili{% else %}Subscription ends{% endif %}</p>
-      <p class="card-value">{{ subscription.expires_on|date:"D, d M Y" }}</p>
-    </article>
-    <article class="card">
-      <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Hali{% else %}Status{% endif %}</p>
-      <p class="card-value">
-        {% if subscription.is_active %}
-          {% if request.LANGUAGE_CODE == 'sw' %}Hai{% else %}Active{% endif %}
-        {% else %}
-          {% if request.LANGUAGE_CODE == 'sw' %}Imesitishwa{% else %}Suspended{% endif %}
-        {% endif %}
-      </p>
-    </article>
-  </div>
-</section>
-
 <section class="card">
   <div class="toolbar" style="margin-bottom: 0.5rem;">
     <h2 class="section-title" style="margin: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Watumiaji wa mfumo{% else %}System users{% endif %}</h2>
@@ -70,7 +33,10 @@
       <thead>
         <tr>
           <th>{% if request.LANGUAGE_CODE == 'sw' %}Mtumiaji{% else %}User{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Mteja{% else %}Client{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Duka la dawa{% else %}Pharmacy{% endif %}</th>
           <th>{% if request.LANGUAGE_CODE == 'sw' %}Nafasi{% else %}Role{% endif %}</th>
+          <th>{% if request.LANGUAGE_CODE == 'sw' %}Siku zilizobaki{% else %}Days left{% endif %}</th>
           <th>{% if request.LANGUAGE_CODE == 'sw' %}Hali{% else %}Status{% endif %}</th>
         </tr>
       </thead>
@@ -78,7 +44,10 @@
         {% for u in staff_users %}
         <tr>
           <td><strong>{{ u.username }}</strong></td>
+          <td>{{ u.pharmacy_profile.client_name|default:"—" }}</td>
+          <td>{{ u.pharmacy_profile.pharmacy_name|default:"—" }}</td>
           <td>{{ u.pharmacy_profile.get_role_display }}</td>
+          <td>{{ u.pharmacy_profile.subscription_days_remaining }}</td>
           <td>
             {% if u.is_active %}
             <span class="badge badge-ok">{% if request.LANGUAGE_CODE == 'sw' %}Hai{% else %}Active{% endif %}</span>

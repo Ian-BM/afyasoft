@@ -4,6 +4,16 @@
 {% block page_heading %}{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi{% else %}Dashboard{% endif %}{% endblock %}
 
 {% block content %}
+<div class="card" style="margin-bottom: 1rem;">
+  <p class="card-label">{% if request.LANGUAGE_CODE == 'sw' %}Karibu{% else %}Welcome{% endif %}</p>
+  <p class="card-value" style="font-size: 1.2rem;">
+    {% if request.LANGUAGE_CODE == 'sw' %}
+      Habari {{ client_name }} — {{ pharmacy_name }}
+    {% else %}
+      Hello {{ client_name }} — {{ pharmacy_name }}
+    {% endif %}
+  </p>
+</div>
 <div class="grid-cards">
   <div class="card card-metric">
     <div>

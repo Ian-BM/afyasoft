@@ -5,13 +5,16 @@
 
 {% block content %}
 <div class="card form-card">
-  <p class="card-hint" style="margin-top: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Tengeneza taarifa za kuingia, chagua nafasi, na kwa mfanyakazi unaweza kumhusisha na meneja.{% else %}Create sign-in credentials, choose role, and optionally assign a manager for worker accounts.{% endif %}</p>
+  <p class="card-hint" style="margin-top: 0;">{% if request.LANGUAGE_CODE == 'sw' %}Admin anaweza kuongeza meneja au mfanyakazi. Meneja anaweza kuongeza wafanyakazi wa duka lake pekee.{% else %}Admin can add managers or workers. Managers can add workers for their pharmacy only.{% endif %}</p>
   <form method="post" novalidate>
     {% csrf_token %}
     {% if form.non_field_errors %}
     <div class="message message-error" style="margin-bottom: 1rem;">{{ form.non_field_errors }}</div>
     {% endif %}
     {% for field in form %}
+    {% if field.is_hidden %}
+      {{ field }}
+    {% else %}
     <div class="form-row">
       <label for="{{ field.id_for_label }}">
         {% if request.LANGUAGE_CODE == 'sw' %}
@@ -23,6 +26,7 @@
       {{ field }}
       {{ field.errors }}
     </div>
+    {% endif %}
     {% endfor %}
     <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;">
       <button type="submit" class="btn btn-primary touch-target">{% if request.LANGUAGE_CODE == 'sw' %}Unda mtumiaji{% else %}Create user{% endif %}</button>

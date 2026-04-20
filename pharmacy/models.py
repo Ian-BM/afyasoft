@@ -30,9 +30,22 @@ class UserProfile(models.Model):
         related_name="pharmacy_workers",
         help_text="Assigned manager for this worker account.",
     )
+    pharmacy_name = models.CharField(max_length=200, blank=True, default="")
+    client_name = models.CharField(max_length=200, blank=True, default="")
+    subscription_started_on = models.DateField(default=timezone.localdate)
+    subscription_duration_days = models.PositiveIntegerField(default=30)
 
     def __str__(self):
         return f"{self.user.username} ({self.get_role_display()})"
+
+    @property
+    def subscription_expires_on(self):
+        return self.subscription_started_on + timedelta(days=self.subscription_duration_days)
+
+    @property
+    def subscription_days_remaining(self):
+        remaining = (self.subscription_expires_on - timezone.localdate()).days
+        return max(0, remaining)
 
 
 class PharmacySubscription(models.Model):
