@@ -1,0 +1,269 @@
+{% extends "pharmacy/website_base.html" %}
+
+{% block page_title %}{% if request.LANGUAGE_CODE == 'sw' %}Nyumbani{% else %}Home{% endif %}{% endblock %}
+
+{% block website_hero %}
+<section class="hero">
+  <div>
+    <div class="js-reveal">
+      <span class="hero-tag">{% if request.LANGUAGE_CODE == 'sw' %}Imeundwa kwa maduka ya dawa{% else %}Built for pharmacies{% endif %}</span>
+      <h1>{% if request.LANGUAGE_CODE == 'sw' %}AfyaSoft — <span class="accent">mfumo</span> wako wa kusimamia duka la dawa{% else %}AfyaSoft — <span class="accent">pharmacy</span> operations in one place{% endif %}</h1>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Hesabu ya dawa, mauzo ya haraka, tahadhari za muda wa kuisha, na ripoti — vyote katika mfumo mmoja salama.{% else %}Inventory, fast checkout, expiry alerts, and reporting in one secure, easy-to-learn system.{% endif %}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza bure{% else %}Start free trial{% endif %}</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Log in{% endif %}</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual-wrap hero-visual-unified js-reveal" aria-label="{% if request.LANGUAGE_CODE == 'sw' %}Muhtasari wa mauzo na dashibodi{% else %}Sales pulse and dashboard preview{% endif %}">
+    <canvas id="three-bg" aria-hidden="true"></canvas>
+    <div class="hero-unified-stack">
+      <div class="hero-unified-metrics">
+        <div class="hero-track-head">
+          <span class="hero-track-live" aria-hidden="true"></span>
+          <span>{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia mauzo{% else %}Live activity{% endif %}</span>
+        </div>
+        <div class="hero-track-value" id="hero-track-root">
+          <span id="hero-track-num">0</span> TZS
+          <span class="hero-track-sub">{% if request.LANGUAGE_CODE == 'sw' %}mauzo leo{% else %}sales today{% endif %}</span>
+        </div>
+        <svg class="hero-spark" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="heroSparkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0284c7"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+          <path id="hero-spark-path" fill="none" stroke="url(#heroSparkGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M0,38 L28,30 L52,34 L76,22 L100,26 L124,14 L148,20 L172,10 L200,16"/>
+        </svg>
+        <div class="hero-mini-bars" aria-hidden="true">
+          <span class="hero-mini-bar js-hero-mini" style="--h:28%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:52%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:38%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:68%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:44%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:76%"></span>
+          <span class="hero-mini-bar js-hero-mini" style="--h:58%"></span>
+        </div>
+        <div class="hero-scan-track" aria-hidden="true"><div class="hero-scan"></div></div>
+      </div>
+      <div class="hero-panel">
+        <div class="hero-panel-inner">
+          <div class="bar" role="presentation"></div>
+          <div class="rows" role="presentation">
+            <div></div><div class="short"></div><div></div><div class="short"></div><div></div>
+          </div>
+        </div>
+        <div class="kpi sales js-float" role="presentation">TZS 24,500</div>
+        <div class="kpi growth js-float" role="presentation">+12%</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block website_content %}
+<section class="stats">
+  <article class="stat js-reveal"><p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Maduka{% else %}Pharmacies{% endif %}</p><p class="value">200+</p></article>
+  <article class="stat js-reveal"><p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Uaminifu{% else %}Uptime focus{% endif %}</p><p class="value">99.9%</p></article>
+  <article class="stat js-reveal"><p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Mzigo{% else %}Stock lines{% endif %}</p><p class="value">10k+</p></article>
+  <article class="stat js-reveal"><p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Msaada{% else %}Support{% endif %}</p><p class="value">24/7</p></article>
+</section>
+
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Changamoto na suluhisho{% else %}Problems and solutions{% endif %}</h2>
+  <div class="split">
+    <article class="mini-card">
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Changamoto{% else %}Challenges{% endif %}</p>
+      <ul>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+        <li>Kufuatilia dawa kwa mkono</li>
+        <li>Dawa kuisha muda bila kujulikana</li>
+        <li>Mauzo polepole na makosa mengi</li>
+        <li>Ripoti hazijajaa wakati</li>
+        {% else %}
+        <li>Manual stock tracking</li>
+        <li>Expiry surprises on the shelf</li>
+        <li>Slow checkout and errors</li>
+        <li>Reports that arrive too late</li>
+        {% endif %}
+      </ul>
+    </article>
+    <article class="mini-card solution">
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Suluhisho{% else %}How AfyaSoft helps{% endif %}</p>
+      <p>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+        AfyaSoft inaunganisha hesabu, mauzo, na ufuatiliaji wa muda katika kiolesura kimoja — kila mtu anajua cha kufanya.
+        {% else %}
+        AfyaSoft connects inventory, sales, and expiry workflows in one interface so your team stays aligned every day.
+        {% endif %}
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="showcase js-reveal">
+  <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Mwonekano wa bidhaa{% else %}Product tour{% endif %}</p>
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Pata uzoefu wa AfyaSoft{% else %}Experience AfyaSoft{% endif %}</h2>
+  <p class="lead">{% if request.LANGUAGE_CODE == 'sw' %}Angalia dashibodi ambayo timu yako itapenda.{% else %}Take a peek at the dashboard your team will love.{% endif %}</p>
+  <div class="tabs" role="tablist">
+    <button type="button" class="tab active" data-panel="p1" role="tab" aria-selected="true">{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi{% else %}Dashboard{% endif %}</button>
+    <button type="button" class="tab" data-panel="p2" role="tab" aria-selected="false">{% if request.LANGUAGE_CODE == 'sw' %}Hesabu{% else %}Inventory{% endif %}</button>
+    <button type="button" class="tab" data-panel="p3" role="tab" aria-selected="false">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo{% else %}Sales{% endif %}</button>
+    <button type="button" class="tab" data-panel="p4" role="tab" aria-selected="false">{% if request.LANGUAGE_CODE == 'sw' %}Muda{% else %}Expiry{% endif %}</button>
+  </div>
+  <div class="show-panel show-panel-split">
+    <div class="show-panel-col show-panel-copy">
+      <p class="show-title" id="show-title">{% if request.LANGUAGE_CODE == 'sw' %}Dashibodi inaonyesha mauzo, stoo, na tahadhari kwa mtazamo mmoja.{% else %}Your dashboard surfaces sales, stock, and alerts in one glance.{% endif %}</p>
+    </div>
+    <div class="show-panel-col show-panel-viz">
+      <p class="show-viz-caption" id="preview-chart-caption">{% if request.LANGUAGE_CODE == 'sw' %}Mauzo wiki (siku 7){% else %}Weekly sales · last 7 days{% endif %}</p>
+      <div class="live-bars" id="preview-live-bars" aria-hidden="true">
+        <span class="live-bar" style="--bh:42;--i:0"></span>
+        <span class="live-bar" style="--bh:58;--i:1"></span>
+        <span class="live-bar" style="--bh:36;--i:2"></span>
+        <span class="live-bar" style="--bh:72;--i:3"></span>
+        <span class="live-bar" style="--bh:48;--i:4"></span>
+        <span class="live-bar" style="--bh:66;--i:5"></span>
+        <span class="live-bar" style="--bh:54;--i:6"></span>
+      </div>
+      <div class="live-toast js-float">
+        <span class="live-toast-icon" aria-hidden="true">!</span>
+        <span>{% if request.LANGUAGE_CODE == 'sw' %}Dawa 3 zinakaribia kuisha muda wiki hii{% else %}3 medicines expire this week{% endif %}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Kwa nini uaminifu{% else %}Why teams trust it{% endif %}</h2>
+  <div class="split">
+    <article class="mini-card">
+      <ul>
+        {% if request.LANGUAGE_CODE == 'sw' %}
+        <li>Mfumo salama wa mtandaoni</li>
+        <li>Hifadhi ya taarifa inayotegemewa</li>
+        <li>Imeundwa kwa maduka ya dawa</li>
+        {% else %}
+        <li>Secure cloud access</li>
+        <li>Reliable data handling</li>
+        <li>Designed for pharmacy workflows</li>
+        {% endif %}
+      </ul>
+    </article>
+    <article class="mini-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;">
+      <div id="lottie-trust" style="width:100%;max-width:280px;height:160px;"></div>
+    </article>
+  </div>
+</section>
+
+<section class="cta-final js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Tayari kuunganisha duka lako?{% else %}Ready to connect your pharmacy?{% endif %}</h2>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Fungua akaunti, alika timu, na anza kuuza ndani ya dakika chache.{% else %}Create your account, invite your team, and start selling in minutes.{% endif %}</p>
+  <div class="actions">
+    <a class="btn btn-secondary" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Fungua akaunti{% else %}Create account{% endif %}</a>
+    <a class="btn btn-ghost-light" href="{% url 'website_contact' %}">{% if request.LANGUAGE_CODE == 'sw' %}Wasiliana{% else %}Contact sales{% endif %}</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block website_scripts %}
+<script>
+  (function () {
+    var spark = document.getElementById("hero-spark-path");
+    var trackNum = document.getElementById("hero-track-num");
+    var barsWrap = document.getElementById("preview-live-bars");
+    var captionEl = document.getElementById("preview-chart-caption");
+    var isSw = "{{ request.LANGUAGE_CODE }}" === "sw";
+
+    var panelBars = {
+      p1: [46, 62, 40, 74, 52, 80, 58],
+      p2: [38, 44, 52, 48, 56, 50, 62],
+      p3: [55, 48, 42, 36, 34, 40, 32],
+      p4: [50, 58, 54, 66, 60, 72, 68],
+    };
+    var panelCaptions = {
+      p1: isSw ? "Mauzo wiki (siku 7)" : "Weekly sales · last 7 days",
+      p2: isSw ? "Mzigo wa dawa (viwango)" : "Stock levels · snapshot",
+      p3: isSw ? "Mauzo ya saa 24" : "Checkout rhythm · 24h",
+      p4: isSw ? "Vipengee vinavyokaribia muda" : "Near-expiry exposure",
+    };
+
+    function formatTzs(n) {
+      return Math.round(n).toLocaleString(isSw ? "sw-TZ" : "en-TZ");
+    }
+
+    if (spark && window.gsap) {
+      var len = typeof spark.getTotalLength === "function" ? spark.getTotalLength() : 280;
+      window.gsap.set(spark, { strokeDasharray: len, strokeDashoffset: len });
+      window.gsap.to(spark, {
+        strokeDashoffset: 0,
+        duration: 2.4,
+        ease: "power2.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    }
+
+    if (trackNum && window.gsap) {
+      var counter = { v: 132000 };
+      trackNum.textContent = formatTzs(counter.v);
+      window.gsap.to(counter, {
+        v: 206000,
+        duration: 2.8,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        onUpdate: function () {
+          trackNum.textContent = formatTzs(Math.round(counter.v));
+        },
+      });
+    } else if (trackNum) {
+      trackNum.textContent = formatTzs(184200);
+    }
+
+    if (window.gsap) {
+      window.gsap.to(".js-hero-mini", {
+        scaleY: 0.35,
+        duration: 0.9,
+        stagger: { each: 0.07, repeat: -1, yoyo: true },
+        ease: "sine.inOut",
+        transformOrigin: "50% 100%",
+      });
+    }
+
+    if (window.anime) {
+      window.anime({
+        targets: ".hero-scan",
+        translateX: ["-30%", "130%"],
+        duration: 3200,
+        easing: "easeInOutSine",
+        loop: true,
+      });
+    }
+
+    function applyPanelBars(panel) {
+      var arr = panelBars[panel] || panelBars.p1;
+      var bars = barsWrap ? barsWrap.querySelectorAll(".live-bar") : [];
+      if (captionEl) captionEl.textContent = panelCaptions[panel] || panelCaptions.p1;
+      bars.forEach(function (el, i) {
+        if (typeof arr[i] === "number") el.style.setProperty("--bh", String(arr[i]));
+      });
+      if (window.gsap && bars.length) {
+        window.gsap.fromTo(
+          bars,
+          { opacity: 0.35, filter: "brightness(0.92)" },
+          { opacity: 1, filter: "brightness(1)", duration: 0.5, stagger: 0.06, ease: "power2.out" }
+        );
+      }
+    }
+
+    window.addEventListener("afya:tab", function (ev) {
+      var panel = (ev.detail && ev.detail.panel) || "p1";
+      applyPanelBars(panel);
+    });
+
+    applyPanelBars("p1");
+  })();
+</script>
+{% endblock %}

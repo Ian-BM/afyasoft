@@ -1,0 +1,560 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a365d">
+  <title>AfyaSoft</title>
+  <link rel="icon" type="image/png" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'pharmacy/img/afyasoft-logo.png' %}">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #5f7387;
+      --border: #d9e3ea;
+      --accent: #1f8e95;
+      --accent-2: #49b2a8;
+      --dark: #0f2f46;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(17, 47, 66, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, 94vw); margin: 0 auto; }
+
+    .hero-wrap {
+      background: linear-gradient(145deg, #338b95 0%, #48a8a9 54%, #5ac0ae 100%);
+      color: #f7fbff;
+      position: relative;
+      overflow: hidden;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+    }
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .brand { display: flex; align-items: center; gap: .55rem; font-weight: 700; }
+    .brand img { width: 34px; height: 34px; border-radius: 8px; }
+    .nav-links { display: flex; gap: 1rem; color: rgba(247, 251, 255, 0.9); font-size: .86rem; }
+    .nav-actions { display: flex; gap: .5rem; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      border-radius: 999px;
+      padding: .6rem 1rem;
+      font-weight: 700;
+      font-size: .84rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .btn-light {
+      background: #ffffff;
+      color: #1d5567;
+      border-color: #fff;
+    }
+    .btn-light:hover { transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      color: #f7fbff;
+      border-color: rgba(255,255,255,.62);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.12); }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 1.2rem;
+      align-items: center;
+      padding: 2rem 0 4.2rem;
+    }
+    .hero .chip {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 999px;
+      padding: .35rem .65rem;
+      font-size: .75rem;
+      font-weight: 700;
+      margin-bottom: .65rem;
+    }
+    .hero h1 {
+      margin: 0 0 .65rem;
+      font-size: clamp(1.85rem, 4.8vw, 3.15rem);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      color: #fff;
+      max-width: 16ch;
+    }
+    .hero p { margin: 0; color: rgba(246, 251, 255, .95); max-width: 58ch; }
+    .hero-actions { margin-top: 1rem; display: flex; gap: .65rem; flex-wrap: wrap; }
+    .hero-note { margin-top: .8rem; font-size: .83rem; opacity: .95; }
+
+    .mock {
+      position: relative;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 14px;
+      box-shadow: 0 18px 36px rgba(16, 38, 48, 0.25);
+      padding: .8rem;
+      min-height: 300px;
+      color: var(--text);
+    }
+    .mock-head { height: 16px; background: #e1edf2; border-radius: 999px; margin-bottom: .7rem; }
+    .mock-grid { display: grid; gap: .45rem; }
+    .line { height: 36px; border-radius: 8px; background: #f2f7f9; border: 1px solid #dce7ec; }
+    .line.short { width: 72%; }
+    .floating {
+      position: absolute;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(16, 38, 48, 0.2);
+      padding: .45rem .62rem;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+    .floating.one { top: -.65rem; right: -.55rem; }
+    .floating.two { bottom: -.7rem; left: -.5rem; }
+    .wave {
+      height: 90px;
+      background: radial-gradient(120% 100% at 50% -20%, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 45%, transparent 72%);
+    }
+
+    .stats {
+      margin-top: -2.1rem;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: .7rem;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .85rem .95rem;
+      box-shadow: var(--shadow);
+    }
+    .k { font-size: .73rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 0; }
+    .v { font-size: 1.7rem; margin: .2rem 0 0; font-weight: 800; letter-spacing: -.02em; }
+
+    .section {
+      margin-top: 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.1rem;
+    }
+    .section h2 {
+      margin: 0 0 .75rem;
+      font-size: clamp(1.3rem, 2.2vw, 2rem);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+    }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .mini-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem;
+      background: #fff;
+    }
+    .mini-card ul { margin: .2rem 0 0; padding-left: 1.1rem; }
+    .mini-card li { margin: .28rem 0; color: #1f3245; }
+    .solution { border-left: 3px solid var(--accent); background: linear-gradient(180deg, #fff, #f2faf9); }
+
+    .showcase {
+      margin-top: 1rem;
+      text-align: center;
+      background: linear-gradient(180deg, #eef6f6, #ffffff);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem;
+    }
+    .tabs { display: flex; justify-content: center; gap: .45rem; flex-wrap: wrap; margin: .75rem 0 .95rem; }
+    .tab {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .5rem .65rem;
+      font-size: .74rem;
+      background: #fff;
+      color: #284359;
+      cursor: pointer;
+    }
+    .tab.active { background: #4aa6a6; color: #fff; border-color: #4aa6a6; }
+    .panel {
+      border: 2px solid #4aa6a6;
+      border-radius: 12px;
+      background: #fff;
+      min-height: 210px;
+      padding: .75rem;
+      text-align: left;
+    }
+    .panel-title { margin: 0 0 .55rem; font-weight: 700; color: #1e4458; }
+    .panel-lines { display: grid; gap: .4rem; }
+    .panel-lines div { height: 24px; border-radius: 6px; background: #f2f7f9; border: 1px solid #dce7ec; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .7rem;
+    }
+    .feature {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .feature-media {
+      height: 120px;
+      background: linear-gradient(140deg, #dbeef0 0%, #bfe0de 50%, #d7eee4 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .feature-body { padding: .75rem; }
+    .feature h3 { margin: 0 0 .35rem; font-size: 1rem; }
+    .feature p { margin: 0; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+
+    .pricing-band {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #c9ece4 0%, #f2f8f8 45%, #cbebe4 100%);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+    .pricing-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1.1fr auto;
+      gap: .8rem;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .price { font-size: clamp(1.4rem, 3vw, 2rem); margin: .3rem 0 .45rem; font-weight: 800; }
+    .price span { color: var(--muted); font-size: .84rem; font-weight: 600; }
+    .checks { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .35rem .8rem; padding-left: 1rem; margin: .2rem 0 0; }
+    .checks li { color: #234257; font-size: .86rem; }
+
+    .testimonials { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-top: .8rem; }
+    .quote { border: 1px solid var(--border); border-radius: 12px; background: #fff; padding: .85rem; }
+    .stars { color: #0f2f46; letter-spacing: .05em; font-size: .85rem; }
+    .quote p { color: var(--muted); font-size: .84rem; line-height: 1.5; }
+    .quote .name { margin-top: .4rem; font-weight: 700; font-size: .9rem; color: #193349; }
+
+    .faq-list { margin-top: .5rem; display: grid; gap: .45rem; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .faq-btn {
+      width: 100%;
+      border: 0;
+      background: #fff;
+      color: #173247;
+      padding: .8rem .9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+    }
+    .faq-btn span:last-child { color: #5c7387; }
+    .faq-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .25s ease;
+      padding: 0 .9rem;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .faq-item.open .faq-content { max-height: 130px; padding: 0 .9rem .8rem; }
+    .faq-item.open .faq-btn span:last-child { transform: rotate(180deg); }
+
+    .cta-final {
+      margin-top: 1rem;
+      background: linear-gradient(180deg, #eff7f7 0%, #ffffff 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .cta-final .actions { margin-top: .7rem; display: flex; justify-content: center; gap: .65rem; flex-wrap: wrap; }
+
+    .footer {
+      margin-top: 1rem;
+      background: #0f2435;
+      color: #d7e3ec;
+      padding: 1.2rem 0;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: .95rem;
+    }
+    .footer h4 { margin: 0 0 .55rem; color: #f2f7fb; font-size: .95rem; }
+    .footer p, .footer li, .footer a { color: #c0d2df; font-size: .84rem; margin: .2rem 0; }
+    .footer ul { margin: 0; padding-left: 1rem; }
+
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; padding-bottom: 3.1rem; }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: -1.4rem; }
+      .split, .feature-grid, .testimonials, .footer-grid { grid-template-columns: 1fr; }
+      .checks { grid-template-columns: 1fr; }
+      .pricing-card { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero-wrap">
+    <div class="container">
+      <header class="top-nav">
+        <a class="brand" href="#top">
+          <img src="{% static 'pharmacy/img/afyasoft-logo.png' %}" alt="AfyaSoft logo">
+          <span>AfyaSoft</span>
+        </a>
+        <nav class="nav-links">
+          <a href="#features">{% if request.LANGUAGE_CODE == 'sw' %}Vipengele{% else %}Features{% endif %}</a>
+          <a href="#pricing">{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Pricing{% endif %}</a>
+          <a href="#faq">FAQs</a>
+        </nav>
+        <div class="nav-actions">
+          <form method="post" action="{% url 'set_language' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" name="language" value="{% if request.LANGUAGE_CODE == 'sw' %}en{% else %}sw{% endif %}" class="btn btn-ghost">
+              {% if request.LANGUAGE_CODE == 'sw' %}EN{% else %}SW{% endif %}
+            </button>
+          </form>
+          <a class="btn btn-ghost" href="{% url 'login' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Login{% endif %}</a>
+        </div>
+      </header>
+
+      <section class="hero" id="top">
+        <div>
+          <span class="chip">{% if request.LANGUAGE_CODE == 'sw' %}Imeundwa kwa maduka ya dawa ya kisasa.{% else %}Built for modern pharmacies.{% endif %}</span>
+          <h1>{% if request.LANGUAGE_CODE == 'sw' %}AfyaSoft — Mfumo Rahisi wa Kusimamia Duka la Dawa{% else %}AfyaSoft — Pharmacy Management Made Simple{% endif %}</h1>
+          <p>{% if request.LANGUAGE_CODE == 'sw' %}Simamia dawa zako, mauzo ya kila siku, na tarehe za mwisho wa matumizi kwa urahisi.{% else %}Track medicine inventory, manage daily sales, and monitor expiry dates in one simple system.{% endif %}</p>
+          <div class="hero-actions">
+            <a class="btn btn-light" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza Kutumia{% else %}Start Free Trial{% endif %}</a>
+            <a class="btn btn-ghost" href="{% url 'login' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Login{% endif %}</a>
+          </div>
+          <p class="hero-note">{% if request.LANGUAGE_CODE == 'sw' %}Mfumo mmoja kwa stoo, mauzo, na ufuatiliaji wa ukwijaji.{% else %}One platform for stock, sales, and expiry tracking.{% endif %}</p>
+        </div>
+        <div class="mock" aria-hidden="true">
+          <div class="mock-head"></div>
+          <div class="mock-grid">
+            <div class="line"></div>
+            <div class="line short"></div>
+            <div class="line"></div>
+            <div class="line short"></div>
+            <div class="line"></div>
+          </div>
+          <div class="floating one">TZS 24,500</div>
+          <div class="floating two">+18.2%</div>
+        </div>
+      </section>
+    </div>
+    <div class="wave"></div>
+  </div>
+
+  <main class="container">
+    <section class="stats">
+      <article class="stat"><p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Maduka{% else %}Pharmacies{% endif %}</p><p class="v">1,000+</p></article>
+      <article class="stat"><p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Wasambazaji{% else %}Distributors{% endif %}</p><p class="v">250+</p></article>
+      <article class="stat"><p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Dawa{% else %}Drugs{% endif %}</p><p class="v">6 Lakh+</p></article>
+      <article class="stat"><p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Saa za Msaada{% else %}Support Hours{% endif %}</p><p class="v">4,200+</p></article>
+    </section>
+
+    <section class="showcase section">
+      <p class="k" style="text-align:center;">{% if request.LANGUAGE_CODE == 'sw' %}Onyesho la bidhaa{% else %}Product showcase{% endif %}</p>
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Pata uzoefu wa usimamizi wa duka la dawa wa kisasa{% else %}Experience the Future of Pharmacy Management{% endif %}</h2>
+      <p style="margin:0;color:var(--muted);">{% if request.LANGUAGE_CODE == 'sw' %}Zana za kisasa zinazokusaidia kusimamia duka lako kwa ufanisi.{% else %}Revolutionize your workflow with a modern pharmacy system.{% endif %}</p>
+      <div class="tabs" id="showcase-tabs">
+        <button class="tab active" data-panel="p1">{% if request.LANGUAGE_CODE == 'sw' %}POS Haraka{% else %}Fast POS{% endif %}</button>
+        <button class="tab" data-panel="p2">{% if request.LANGUAGE_CODE == 'sw' %}Hesabu ya Dawa{% else %}Inventory{% endif %}</button>
+        <button class="tab" data-panel="p3">{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa Ukwijaji{% else %}Expiry Tracking{% endif %}</button>
+        <button class="tab" data-panel="p4">{% if request.LANGUAGE_CODE == 'sw' %}Ripoti{% else %}Reports{% endif %}</button>
+      </div>
+      <div class="panel">
+        <p class="panel-title" id="panel-title">{% if request.LANGUAGE_CODE == 'sw' %}Mfumo wa mauzo ulio rahisi na wa haraka{% else %}Simple and fast sales interface{% endif %}</p>
+        <div class="panel-lines">
+          <div></div><div></div><div></div><div></div><div></div><div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Changamoto na Suluhisho{% else %}Problem & Solution{% endif %}</h2>
+      <div class="split">
+        <article class="mini-card">
+          <p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Changamoto za kawaida{% else %}Problems pharmacies face{% endif %}</p>
+          <ul>
+            {% if request.LANGUAGE_CODE == 'sw' %}
+            <li>Kufuatilia dawa kwa mkono</li>
+            <li>Dawa kuisha muda wa matumizi bila kujulikana</li>
+            <li>Kurekodi mauzo polepole</li>
+            <li>Ugumu wa kujua mapato ya kila siku</li>
+            {% else %}
+            <li>Manual stock tracking</li>
+            <li>Medicines expiring unnoticed</li>
+            <li>Slow sales recording</li>
+            <li>Difficulty knowing daily revenue</li>
+            {% endif %}
+          </ul>
+        </article>
+        <article class="mini-card solution">
+          <p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Suluhisho{% else %}Solution{% endif %}</p>
+          <p style="margin:.3rem 0 0;color:var(--muted);">
+            {% if request.LANGUAGE_CODE == 'sw' %}
+              AfyaSoft husaidia maduka ya dawa kusimamia hesabu ya dawa, mauzo, na tarehe za mwisho wa matumizi kwa mfumo mmoja.
+            {% else %}
+              AfyaSoft helps pharmacies manage inventory, sales, and expiry tracking in one system.
+            {% endif %}
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Vipengele Muhimu{% else %}Everything You Need to Run Your Pharmacy{% endif %}</h2>
+      <div class="feature-grid">
+        <article class="feature"><div class="feature-media"></div><div class="feature-body"><h3>{% if request.LANGUAGE_CODE == 'sw' %}Mfumo wa Mauzo Haraka{% else %}Fast POS System{% endif %}</h3><p>{% if request.LANGUAGE_CODE == 'sw' %}Uza dawa kwa haraka kwa kutumia mfumo rahisi wa mauzo.{% else %}Sell medicines quickly using a simple search and checkout interface.{% endif %}</p></div></article>
+        <article class="feature"><div class="feature-media"></div><div class="feature-body"><h3>{% if request.LANGUAGE_CODE == 'sw' %}Usimamizi wa Hesabu ya Dawa{% else %}Inventory Management{% endif %}</h3><p>{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia kiasi cha dawa na ujue wakati wa kuongeza.{% else %}Track medicine stock levels and know when to restock.{% endif %}</p></div></article>
+        <article class="feature"><div class="feature-media"></div><div class="feature-body"><h3>{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa Tarehe za Mwisho wa Matumizi{% else %}Expiry Tracking{% endif %}</h3><p>{% if request.LANGUAGE_CODE == 'sw' %}Pata tahadhari dawa zinapokaribia kuisha muda.{% else %}Get alerts when medicines are close to expiry.{% endif %}</p></div></article>
+        <article class="feature"><div class="feature-media"></div><div class="feature-body"><h3>{% if request.LANGUAGE_CODE == 'sw' %}Ripoti za Mauzo{% else %}Sales Reports{% endif %}</h3><p>{% if request.LANGUAGE_CODE == 'sw' %}Angalia mauzo ya kila siku na utendaji wa duka.{% else %}View daily sales and track pharmacy performance.{% endif %}</p></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Jinsi Inavyofanya Kazi{% else %}How It Works{% endif %}</h2>
+      <div class="split">
+        <article class="mini-card"><p class="k">1</p><p>{% if request.LANGUAGE_CODE == 'sw' %}Ongeza dawa kwenye mfumo wako{% else %}Add medicines to your inventory{% endif %}</p></article>
+        <article class="mini-card"><p class="k">2</p><p>{% if request.LANGUAGE_CODE == 'sw' %}Rekodi mauzo kupitia mfumo wa POS{% else %}Record sales through the POS system{% endif %}</p></article>
+      </div>
+      <div class="mini-card" style="margin-top:.7rem;"><p class="k">3</p><p>{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia hesabu ya dawa na tarehe za mwisho wa matumizi kiotomatiki{% else %}Monitor stock levels and expiry dates automatically{% endif %}</p></div>
+    </section>
+
+    <section class="pricing-band" id="pricing">
+      <article class="pricing-card">
+        <div>
+          <p class="k">{% if request.LANGUAGE_CODE == 'sw' %}Mpango wa Mwanzo{% else %}Starter Plan{% endif %}</p>
+          <p class="price">10,000 TZS <span>{% if request.LANGUAGE_CODE == 'sw' %}kwa mwezi{% else %}per month{% endif %}</span></p>
+          <ul class="checks">
+            {% if request.LANGUAGE_CODE == 'sw' %}
+            <li>Usimamizi wa hesabu ya dawa</li><li>Mfumo wa mauzo</li><li>Tahadhari za kuisha muda</li><li>Ripoti za msingi</li>
+            {% else %}
+            <li>Inventory tracking</li><li>POS sales system</li><li>Expiry alerts</li><li>Basic reports</li>
+            {% endif %}
+          </ul>
+        </div>
+        <div style="display:flex;gap:.55rem;flex-wrap:wrap;">
+          <a class="btn btn-light" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza{% else %}Get Started{% endif %}</a>
+          <a class="btn btn-ghost" href="{% url 'login' %}" style="color:#1a5162;border-color:#b3ccd7;">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Login{% endif %}</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Wateja Wanasemaje{% else %}What Our Customers Say{% endif %}</h2>
+      <div class="testimonials">
+        <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"AfyaSoft imeturahisishia usimamizi wa duka kila siku."{% else %}"AfyaSoft helps our team stay on top of stock and sales every day."{% endif %}</p><div class="name">Asha — Pharmacy Owner</div></article>
+        <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"Ufuatiliaji wa kuisha muda umetupunguzia hasara kubwa."{% else %}"Expiry tracking reduced avoidable losses significantly."{% endif %}</p><div class="name">John — Operations Manager</div></article>
+        <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"POS ni rahisi sana kwa wafanyakazi wetu wapya."{% else %}"The POS is fast and easy for new staff to learn."{% endif %}</p><div class="name">Mariam — Pharmacist</div></article>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Maswali Yanayoulizwa Mara kwa Mara{% else %}Frequently Asked Questions{% endif %}</h2>
+      <div class="faq-list" id="faq-list">
+        <article class="faq-item open"><button class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Je, 10,000 TZS ni bei ya mwisho?{% else %}Is 10,000 TZS the total monthly cost?{% endif %}</span><span>⌄</span></button><div class="faq-content">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo, huu ni mpango wa mwanzo kwa mwezi.{% else %}Yes, this is the starter monthly plan.{% endif %}</div></article>
+        <article class="faq-item"><button class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Naweza kujaribu kabla ya kulipia?{% else %}Can I try before paying?{% endif %}</span><span>⌄</span></button><div class="faq-content">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo, unaweza kuanza akaunti na kujaribu mfumo.{% else %}Yes, start an account and explore the system first.{% endif %}</div></article>
+        <article class="faq-item"><button class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Mfumo ni salama?{% else %}Is my pharmacy data secure?{% endif %}</span><span>⌄</span></button><div class="faq-content">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo, data inalindwa na hifadhi za mara kwa mara.{% else %}Yes, your data is protected with regular backups.{% endif %}</div></article>
+        <article class="faq-item"><button class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Je, inasaidia tahadhari za ukwijaji?{% else %}Does it support expiry alerts?{% endif %}</span><span>⌄</span></button><div class="faq-content">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo, utapata tahadhari za dawa zinazokaribia kuisha muda.{% else %}Yes, you'll get alerts for medicines nearing expiry.{% endif %}</div></article>
+      </div>
+    </section>
+
+    <section class="cta-final">
+      <h2>{% if request.LANGUAGE_CODE == 'sw' %}Je, uko tayari kurahisisha uendeshaji wa duka lako la dawa?{% else %}Ready to simplify pharmacy operations?{% endif %}</h2>
+      <p style="margin:0;color:var(--muted);">{% if request.LANGUAGE_CODE == 'sw' %}Anza kutumia AfyaSoft leo.{% else %}Start using AfyaSoft today.{% endif %}</p>
+      <div class="actions">
+        <a class="btn btn-light" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Fungua Akaunti{% else %}Create Pharmacy Account{% endif %}</a>
+        <a class="btn btn-ghost" href="{% url 'login' %}" style="color:#1a5162;border-color:#b3ccd7;">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Login{% endif %}</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>AfyaSoft</h4>
+        <p>Pharmacy Management System</p>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}AfyaSoft — Kurahisisha Usimamizi wa Maduka ya Dawa{% else %}AfyaSoft — Simplifying Pharmacy Management{% endif %}</p>
+      </div>
+      <div>
+        <h4>{% if request.LANGUAGE_CODE == 'sw' %}Viungo{% else %}Quick Links{% endif %}</h4>
+        <ul><li><a href="#features">{% if request.LANGUAGE_CODE == 'sw' %}Vipengele{% else %}Features{% endif %}</a></li><li><a href="#pricing">{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Pricing{% endif %}</a></li><li><a href="#faq">FAQs</a></li></ul>
+      </div>
+      <div>
+        <h4>{% if request.LANGUAGE_CODE == 'sw' %}Mawasiliano{% else %}Contact Us{% endif %}</h4>
+        <p>Email: info@afyasoft.co.tz</p>
+        <p>Phone: +255 621 932 919</p>
+      </div>
+      <div>
+        <h4>{% if request.LANGUAGE_CODE == 'sw' %}Hatua{% else %}Start Now{% endif %}</h4>
+        <p><a href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza Kutumia{% else %}Start Free Trial{% endif %}</a></p>
+        <p><a href="{% url 'login' %}">{% if request.LANGUAGE_CODE == 'sw' %}Ingia{% else %}Login{% endif %}</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const tabs = document.querySelectorAll(".tab");
+      const panelTitle = document.getElementById("panel-title");
+      const tabMap = {
+        p1: "{% if request.LANGUAGE_CODE == 'sw' %}Mfumo wa mauzo ulio rahisi na wa haraka{% else %}Simple and fast sales interface{% endif %}",
+        p2: "{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia dawa, ongeza stoo, na simamia kwa urahisi{% else %}Track medicines, restock quickly, and stay organized{% endif %}",
+        p3: "{% if request.LANGUAGE_CODE == 'sw' %}Pata tahadhari za dawa kabla ya kuisha muda{% else %}Get alerts before medicines expire{% endif %}",
+        p4: "{% if request.LANGUAGE_CODE == 'sw' %}Ripoti za kila siku kwa maamuzi bora{% else %}Daily reports for smarter decisions{% endif %}",
+      };
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          if (panelTitle) panelTitle.textContent = tabMap[tab.dataset.panel] || tabMap.p1;
+        });
+      });
+
+      const faqItems = document.querySelectorAll(".faq-item");
+      faqItems.forEach((item) => {
+        const btn = item.querySelector(".faq-btn");
+        if (!btn) return;
+        btn.addEventListener("click", () => {
+          const isOpen = item.classList.contains("open");
+          faqItems.forEach((x) => x.classList.remove("open"));
+          if (!isOpen) item.classList.add("open");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

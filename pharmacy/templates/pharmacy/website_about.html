@@ -1,0 +1,36 @@
+{% extends "pharmacy/website_base.html" %}
+
+{% block page_title %}{% if request.LANGUAGE_CODE == 'sw' %}Kuhusu{% else %}About{% endif %}{% endblock %}
+
+{% block website_hero %}
+<div class="page-hero js-reveal">
+  <span class="hero-tag">{% if request.LANGUAGE_CODE == 'sw' %}Kuhusu{% else %}About{% endif %}</span>
+  <h1>{% if request.LANGUAGE_CODE == 'sw' %}AfyaSoft kwa ajili ya maduka halisi ya dawa{% else %}AfyaSoft for real pharmacy operations{% endif %}</h1>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Tunajenga zana rahisi zinazolingana na jinsi maduka yanavyofanya kazi kila siku — si tu kwa demo, bali kwa matumizi ya kweli.{% else %}We build simple tools that match how pharmacies work day to day, not just demo screens.{% endif %}</p>
+</div>
+{% endblock %}
+
+{% block website_content %}
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Dhamira na uaminifu{% else %}Mission and reliability{% endif %}</h2>
+  <div class="split">
+    <article class="mini-card">
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Dhamira{% else %}Mission{% endif %}</p>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Kusaidia maduka ya dawa kupata data sahihi kwa wakati na kufanya maamuzi bora ya stoo na mauzo.{% else %}Help pharmacies get timely, accurate data to make better stock and sales decisions.{% endif %}</p>
+    </article>
+    <article class="mini-card">
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Uaminifu{% else %}Reliability{% endif %}</p>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Mfumo unaotegemewa, kiolesura kinachosoma vizuri, na msaada unaoweza kupatikana unapohitaji.{% else %}A dependable system, readable UI, and support when you need a hand.{% endif %}</p>
+    </article>
+  </div>
+</section>
+
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Wateja wanasema nini{% else %}What customers say{% endif %}</h2>
+  <div class="testimonials">
+    <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"AfyaSoft imeturahisishia hesabu na mauzo kila siku."{% else %}"AfyaSoft made daily inventory and sales calmer for our team."{% endif %}</p><div class="name">Asha — {% if request.LANGUAGE_CODE == 'sw' %}Mmiliki wa duka{% else %}Pharmacy owner{% endif %}</div></article>
+    <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"Ripoti zinaonyesha wazi tunachokusanya kila siku."{% else %}"Reports finally show what we collect each day, clearly."{% endif %}</p><div class="name">John — {% if request.LANGUAGE_CODE == 'sw' %}Meneja{% else %}Operations{% endif %}</div></article>
+    <article class="quote"><div class="stars">★★★★★</div><p>{% if request.LANGUAGE_CODE == 'sw' %}"Wafanyakazi wapya wanajifunza haraka."{% else %}"New staff pick it up quickly."{% endif %}</p><div class="name">Mariam — {% if request.LANGUAGE_CODE == 'sw' %}Daktari wa dawa{% else %}Pharmacist{% endif %}</div></article>
+  </div>
+</section>
+{% endblock %}

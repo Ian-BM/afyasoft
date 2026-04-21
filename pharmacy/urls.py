@@ -3,10 +3,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("", views.landing, name="landing"),
+    path("features/", views.website_features, name="website_features"),
+    path("pricing/", views.website_pricing, name="website_pricing"),
+    path("about/", views.website_about, name="website_about"),
+    path("contact/", views.website_contact, name="website_contact"),
     path("register/", views.register_client, name="register"),
     path("sw.js", views.service_worker, name="service_worker"),
     path("api/sync-sale/", views.sync_sale, name="sync_sale"),
-    path("", views.dashboard, name="dashboard"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("sales/", views.sales_pos, name="sales"),
     path("sales/receipt/<int:pk>/", views.receipt, name="receipt"),
     path("receipts/", views.receipt_archive, name="receipt_archive"),

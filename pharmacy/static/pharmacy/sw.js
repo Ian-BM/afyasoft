@@ -1,5 +1,5 @@
 /* Afya Soft — offline shell cache (GET only; API always live when reachable) */
-const CACHE = "afyasoft-shell-v7";
+const CACHE = "afyasoft-shell-v8";
 const PRECACHE = [
   "/static/pharmacy/css/app.css",
   "/static/pharmacy/js/offline.js",

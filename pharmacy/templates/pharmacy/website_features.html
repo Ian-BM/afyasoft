@@ -1,0 +1,466 @@
+{% extends "pharmacy/website_base.html" %}
+
+{% block page_title %}{% if request.LANGUAGE_CODE == 'sw' %}Vipengele{% else %}Features{% endif %}{% endblock %}
+
+{% block website_extra_css %}
+<style>
+  /* Features page: capability illustrations + step flow */
+  .page-features .section-lead--tight {
+    margin: 0.35rem 0 1.15rem;
+    max-width: 50ch;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .page-features .feature-media {
+    position: relative;
+    height: 132px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-features .feature-media--pos {
+    background: linear-gradient(145deg, #e0f2fe 0%, #f0f9ff 55%, #dbeafe 100%);
+  }
+  .page-features .feature-media--inv {
+    background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 45%, #f0fdf4 100%);
+  }
+  .page-features .feature-media--exp {
+    background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 50%, #fef3c7 100%);
+  }
+  .page-features .feature-media--rep {
+    background: linear-gradient(145deg, #e0e7ff 0%, #e0f2fe 55%, #f5f3ff 100%);
+  }
+
+  /* POS: scan beam + receipt */
+  .feat-pos-wrap {
+    position: relative;
+    width: 86%;
+    max-width: 200px;
+    padding: 0.5rem 0.55rem 0.6rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+  }
+  .feat-pos-search {
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e2e8f0, #f1f5f9);
+    margin-bottom: 0.45rem;
+  }
+  .feat-pos-row {
+    height: 7px;
+    border-radius: 4px;
+    background: #cbd5e1;
+    margin-bottom: 0.32rem;
+    width: 100%;
+    animation: featRowPulse 2.4s ease-in-out infinite;
+  }
+  .feat-pos-row--w70 { width: 72%; animation-delay: 0.15s; }
+  .feat-pos-row--w55 { width: 58%; animation-delay: 0.3s; }
+  .feat-pos-total {
+    margin-top: 0.4rem;
+    height: 12px;
+    width: 48%;
+    margin-left: auto;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #0284c7, #0ea5e9);
+    animation: featTotalGlow 2.2s ease-in-out infinite;
+  }
+  .feat-pos-beam {
+    position: absolute;
+    left: -30%;
+    top: 0;
+    width: 38%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.35), transparent);
+    animation: featBeam 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes featBeam {
+    0%, 100% { transform: translateX(0); opacity: 0; }
+    15% { opacity: 1; }
+    50% { transform: translateX(220%); opacity: 1; }
+    70% { opacity: 0; }
+  }
+  @keyframes featRowPulse {
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 1; }
+  }
+  @keyframes featTotalGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.35); }
+    50% { box-shadow: 0 0 12px 2px rgba(14, 165, 233, 0.25); }
+  }
+
+  /* Inventory: animated stock bars */
+  .feat-inv-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 7px;
+    height: 72px;
+    padding: 0 0.75rem;
+  }
+  .feat-inv-bars span {
+    width: 14px;
+    border-radius: 5px 5px 2px 2px;
+    background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+    transform-origin: bottom center;
+    animation: featBarUp 2.6s ease-in-out infinite;
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+  }
+  .feat-inv-bars span:nth-child(1) { height: 38%; animation-delay: 0s; }
+  .feat-inv-bars span:nth-child(2) { height: 62%; animation-delay: 0.12s; }
+  .feat-inv-bars span:nth-child(3) { height: 48%; animation-delay: 0.24s; }
+  .feat-inv-bars span:nth-child(4) { height: 78%; animation-delay: 0.36s; }
+  .feat-inv-bars span:nth-child(5) { height: 54%; animation-delay: 0.48s; }
+  @keyframes featBarUp {
+    0%, 100% { transform: scaleY(0.88); }
+    50% { transform: scaleY(1); }
+  }
+
+  /* Expiry: calendar + pulse */
+  .feat-exp-wrap {
+    position: relative;
+    width: 108px;
+    height: 88px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 6px 18px rgba(234, 88, 12, 0.12);
+    padding: 0.4rem 0.45rem;
+  }
+  .feat-exp-head {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f97316, #fb923c);
+    margin-bottom: 0.45rem;
+  }
+  .feat-exp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .feat-exp-grid i {
+    display: block;
+    height: 10px;
+    border-radius: 3px;
+    background: #e2e8f0;
+    font-style: normal;
+  }
+  .feat-exp-grid i:nth-child(6),
+  .feat-exp-grid i:nth-child(11) {
+    background: linear-gradient(180deg, #fecaca, #f87171);
+    animation: featExpBlink 1.8s ease-in-out infinite;
+  }
+  .feat-exp-ring {
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #ef4444;
+    animation: featRing 2s ease-out infinite;
+  }
+  .feat-exp-dot {
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+  }
+  @keyframes featExpBlink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.65; transform: scale(0.92); }
+  }
+  @keyframes featRing {
+    0% { transform: scale(0.6); opacity: 0.9; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  /* Reporting: SVG chart stroke */
+  .feat-rep-chart {
+    width: 92%;
+    max-width: 210px;
+    height: auto;
+    display: block;
+  }
+  .feat-rep-chart .feat-rep-line {
+    fill: none;
+    stroke: url(#featRepGrad);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 140;
+    stroke-dashoffset: 140;
+    animation: featChartDraw 3.2s ease-in-out infinite;
+  }
+  .feat-rep-chart .feat-rep-fill {
+    opacity: 0.35;
+    animation: featFillFade 3.2s ease-in-out infinite;
+  }
+  @keyframes featChartDraw {
+    0% { stroke-dashoffset: 140; }
+    45%, 70% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -140; }
+  }
+  @keyframes featFillFade {
+    0%, 20% { opacity: 0; }
+    50%, 65% { opacity: 0.4; }
+    100% { opacity: 0; }
+  }
+
+  /* How it works — timeline */
+  .steps-section .section-lead {
+    margin: -0.35rem 0 1.25rem;
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .steps-flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    position: relative;
+    z-index: 0;
+  }
+  @media (max-width: 820px) {
+    .steps-flow { grid-template-columns: 1fr; }
+  }
+  .steps-flow::before {
+    content: "";
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    top: 0.55rem;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--border) 8%, var(--border) 92%, transparent);
+    border-radius: 999px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @media (max-width: 820px) {
+    .steps-flow::before { display: none; }
+  }
+  .steps-item {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 2.35rem 1rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .steps-item:hover {
+    border-color: rgba(2, 132, 199, 0.35);
+    box-shadow: var(--shadow-md);
+  }
+  .steps-item .steps-num {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -50%);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    border: 3px solid var(--bg-elevated);
+    z-index: 1;
+  }
+  .steps-viz {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.65rem;
+    color: var(--accent);
+  }
+  .steps-viz svg {
+    width: 56px;
+    height: 56px;
+    opacity: 0.92;
+  }
+  .steps-item .meta {
+    margin-bottom: 0.35rem;
+  }
+  .steps-item > p:last-of-type {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.5;
+    text-align: center;
+  }
+  .steps-anim-pill {
+    animation: stepsFloat 2.8s ease-in-out infinite;
+  }
+  @keyframes stepsFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}page-features{% endblock %}
+
+{% block website_hero %}
+<div class="page-hero js-reveal">
+  <span class="hero-tag">{% if request.LANGUAGE_CODE == 'sw' %}Vipengele{% else %}Features{% endif %}</span>
+  <h1>{% if request.LANGUAGE_CODE == 'sw' %}Kila kitu unachohitaji kuendesha duka la dawa{% else %}Everything you need to run your pharmacy{% endif %}</h1>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}AfyaSoft huunganisha mauzo, hesabu, ufuatiliaji wa muda, na ripoti katika mfumo mmoja wenye mwonekano safi.{% else %}AfyaSoft brings POS, inventory, expiry monitoring, and reporting together in one clean workspace.{% endif %}</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza bure{% else %}Start free trial{% endif %}</a>
+    <a class="btn btn-secondary" href="{% url 'website_pricing' %}">{% if request.LANGUAGE_CODE == 'sw' %}Angalia bei{% else %}View pricing{% endif %}</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block website_content %}
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Vipengele muhimu{% else %}Core capabilities{% endif %}</h2>
+  <p class="section-lead section-lead--tight">
+    {% if request.LANGUAGE_CODE == 'sw' %}
+    Zana zinazoungana kwa urahisi ili timu yako ifanye kazi haraka kila siku.
+    {% else %}
+    Connected tools your team can rely on at the counter and in the back office.
+    {% endif %}
+  </p>
+  <div class="feature-grid">
+    <article class="feature js-reveal">
+      <div class="feature-media feature-media--pos" aria-hidden="true">
+        <div class="feat-pos-wrap">
+          <span class="feat-pos-beam"></span>
+          <div class="feat-pos-search"></div>
+          <div class="feat-pos-row"></div>
+          <div class="feat-pos-row feat-pos-row--w70"></div>
+          <div class="feat-pos-row feat-pos-row--w55"></div>
+          <div class="feat-pos-total"></div>
+        </div>
+      </div>
+      <div class="feature-body">
+        <h3>{% if request.LANGUAGE_CODE == 'sw' %}Mfumo wa mauzo wa haraka{% else %}Fast point of sale{% endif %}</h3>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Tafuta dawa haraka, ongeza kwenye kasha, na maliza mauzo kwa urahisi.{% else %}Search medicines, build the cart, and complete sales without friction.{% endif %}</p>
+      </div>
+    </article>
+    <article class="feature js-reveal">
+      <div class="feature-media feature-media--inv" aria-hidden="true">
+        <div class="feat-inv-bars">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <h3>{% if request.LANGUAGE_CODE == 'sw' %}Usimamizi wa hesabu{% else %}Inventory control{% endif %}</h3>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia kiasi, marekebisho, na historia ya harakati za stoo.{% else %}Track quantities, adjustments, and a clear audit trail for stock changes.{% endif %}</p>
+      </div>
+    </article>
+    <article class="feature js-reveal">
+      <div class="feature-media feature-media--exp" aria-hidden="true">
+        <div class="feat-exp-wrap">
+          <div class="feat-exp-head"></div>
+          <div class="feat-exp-grid">
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <span class="feat-exp-ring" aria-hidden="true"></span>
+          <span class="feat-exp-dot" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <h3>{% if request.LANGUAGE_CODE == 'sw' %}Ufuatiliaji wa muda{% else %}Expiry monitoring{% endif %}</h3>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Tambua mapema dawa zinazokaribia kuisha muda ili kuepuka hasara.{% else %}Spot near-expiry items early so you can rotate stock and reduce waste.{% endif %}</p>
+      </div>
+    </article>
+    <article class="feature js-reveal">
+      <div class="feature-media feature-media--rep" aria-hidden="true">
+        <svg class="feat-rep-chart" viewBox="0 0 120 56" aria-hidden="true">
+          <defs>
+            <linearGradient id="featRepGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0284c7"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+            <linearGradient id="featRepFillGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path class="feat-rep-fill" d="M4,42 L22,36 L40,38 L58,24 L76,28 L94,14 L112,18 L116,18 L116,52 L4,52 Z" fill="url(#featRepFillGrad)"/>
+          <path class="feat-rep-line" d="M4,42 L22,36 L40,38 L58,24 L76,28 L94,14 L112,18"/>
+        </svg>
+      </div>
+      <div class="feature-body">
+        <h3>{% if request.LANGUAGE_CODE == 'sw' %}Ripoti za mauzo{% else %}Sales reporting{% endif %}</h3>
+        <p>{% if request.LANGUAGE_CODE == 'sw' %}Angalia mauzo ya kila siku na mwelekeo wa biashara yako.{% else %}Review daily performance and trends to guide purchasing and pricing.{% endif %}</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section js-reveal steps-section">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Jinsi inavyofanya kazi{% else %}How it works{% endif %}</h2>
+  <p class="section-lead">
+    {% if request.LANGUAGE_CODE == 'sw' %}
+    Hatua tatu zinazoelekeza kutoka kwenye stoo hadi ripoti — bila mchakato mgumu.
+    {% else %}
+    Three straightforward steps from stock setup to insight—without a heavy process.
+    {% endif %}
+  </p>
+  <ol class="steps-flow" role="list">
+    <li class="steps-item js-reveal">
+      <span class="steps-num" aria-hidden="true">1</span>
+      <div class="steps-viz steps-anim-pill" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="10" width="32" height="28" rx="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M14 18h20M14 24h14M14 30h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="34" cy="16" r="5" fill="var(--accent-soft)" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Hatua 1{% else %}Step 1{% endif %}</p>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Weka dawa na viwango vya bei na muda wa kuisha.{% else %}Add medicines with pricing and expiry details.{% endif %}</p>
+    </li>
+    <li class="steps-item js-reveal">
+      <span class="steps-num" aria-hidden="true">2</span>
+      <div class="steps-viz steps-anim-pill" aria-hidden="true" style="animation-delay:0.2s;">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="14" width="36" height="22" rx="3" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 22h10M12 28h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <rect x="28" y="18" width="12" height="8" rx="1" fill="currentColor" opacity="0.25"/>
+        </svg>
+      </div>
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Hatua 2{% else %}Step 2{% endif %}</p>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Rekodi mauzo kupitia mfumo wa mauzo.{% else %}Record sales through the POS as customers check out.{% endif %}</p>
+    </li>
+    <li class="steps-item js-reveal">
+      <span class="steps-num" aria-hidden="true">3</span>
+      <div class="steps-viz steps-anim-pill" aria-hidden="true" style="animation-delay:0.4s;">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 36V12l6 4 6-4 6 4 6-4 8 4v24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 30l6 6 12-14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Hatua 3{% else %}Step 3{% endif %}</p>
+      <p>{% if request.LANGUAGE_CODE == 'sw' %}Fuatilia stoo na tahadhari za muda kiotomatiki.{% else %}Let stock levels and expiry alerts update automatically from activity.{% endif %}</p>
+    </li>
+  </ol>
+</section>
+{% endblock %}

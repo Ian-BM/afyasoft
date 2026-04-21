@@ -1,0 +1,53 @@
+{% extends "pharmacy/website_base.html" %}
+
+{% block page_title %}{% if request.LANGUAGE_CODE == 'sw' %}Wasiliana{% else %}Contact{% endif %}{% endblock %}
+
+{% block website_hero %}
+<div class="page-hero js-reveal">
+  <span class="hero-tag">{% if request.LANGUAGE_CODE == 'sw' %}Wasiliana{% else %}Contact{% endif %}</span>
+  <h1>{% if request.LANGUAGE_CODE == 'sw' %}Tuko hapa kusaidia duka lako{% else %}We are here to help your pharmacy{% endif %}</h1>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Andaa maswali yako kuhusu bei, mafunzo, au msaada wa kiufundi — tutajibu haraka iwezekanavyo.{% else %}Ask about pricing, onboarding, or technical help and we will respond as soon as we can.{% endif %}</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="https://wa.me/255621932919" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <a class="btn btn-secondary" href="mailto:info@afyasoft.co.tz">Email</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block website_content %}
+<section class="section js-reveal">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Maelezo{% else %}Details{% endif %}</h2>
+  <div class="split">
+    <article class="mini-card">
+      <p class="meta">Email</p>
+      <p><a href="mailto:info@afyasoft.co.tz">info@afyasoft.co.tz</a></p>
+    </article>
+    <article class="mini-card">
+      <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Simu{% else %}Phone{% endif %}</p>
+      <p><a href="tel:+255621932919">+255 621 932 919</a></p>
+    </article>
+  </div>
+  <article class="mini-card js-reveal" style="margin-top:1rem;">
+    <p class="meta">{% if request.LANGUAGE_CODE == 'sw' %}Eneo{% else %}Location{% endif %}</p>
+    <p>{% if request.LANGUAGE_CODE == 'sw' %}Dar es Salaam, Tanzania{% else %}Dar es Salaam, Tanzania{% endif %}</p>
+  </article>
+</section>
+
+<section class="section js-reveal">
+  <h2>FAQ</h2>
+  <div class="faq-list">
+    <article class="faq-item open">
+      <button type="button" class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Je, msaada wa kiufundi unapatikana?{% else %}Do you offer technical support?{% endif %}</span><span>⌄</span></button>
+      <div class="faq-content">
+        <div class="faq-content-inner">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo — unaweza kuwasiliana kupitia WhatsApp au barua pepe kwa masuala ya kila siku.{% else %}Yes — reach us on WhatsApp or email for day-to-day questions.{% endif %}</div>
+      </div>
+    </article>
+    <article class="faq-item">
+      <button type="button" class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Ninawezaje kuanza?{% else %}How do I get started?{% endif %}</span><span>⌄</span></button>
+      <div class="faq-content">
+        <div class="faq-content-inner">{% if request.LANGUAGE_CODE == 'sw' %}Jisajili, ingia, kisha anza kuongeza dawa na kuweka bei.{% else %}Register, sign in, then add medicines and pricing to go live.{% endif %}</div>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

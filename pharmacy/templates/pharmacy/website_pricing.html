@@ -1,0 +1,237 @@
+{% extends "pharmacy/website_base.html" %}
+
+{% block body_class %}page-pricing{% endblock %}
+
+{% block page_title %}{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Pricing{% endif %}{% endblock %}
+
+{% block website_extra_css %}
+<style>
+  .page-pricing .pricing-band {
+    position: relative;
+    overflow: hidden;
+    border: none;
+    background: transparent;
+    padding: clamp(1.25rem, 4vw, 2.75rem) 0 clamp(0.5rem, 2vw, 1rem);
+    isolation: isolate;
+  }
+  .page-pricing .pricing-stack {
+    position: relative;
+    max-width: 880px;
+    margin-inline: auto;
+    isolation: isolate;
+  }
+  .page-pricing .pricing-ambient {
+    position: absolute;
+    inset: -20% -10% auto;
+    height: 85%;
+    max-height: 420px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .page-pricing .pricing-ambient span {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(48px);
+    opacity: 0.55;
+    animation: pricingOrb 14s ease-in-out infinite;
+  }
+  .page-pricing .pricing-ambient span:nth-child(1) {
+    width: min(52vw, 340px);
+    height: min(52vw, 340px);
+    left: 5%;
+    top: 0;
+    background: radial-gradient(circle at 30% 30%, #7dd3fc, transparent 65%);
+    animation-delay: 0s;
+  }
+  .page-pricing .pricing-ambient span:nth-child(2) {
+    width: min(44vw, 280px);
+    height: min(44vw, 280px);
+    right: 0;
+    top: 15%;
+    background: radial-gradient(circle at 70% 40%, #bae6fd, transparent 60%);
+    animation-delay: -4s;
+  }
+  .page-pricing .pricing-ambient span:nth-child(3) {
+    width: min(36vw, 220px);
+    height: min(36vw, 220px);
+    left: 38%;
+    top: 35%;
+    background: radial-gradient(circle, #e0f2fe, transparent 70%);
+    opacity: 0.4;
+    animation-delay: -7s;
+  }
+  @keyframes pricingOrb {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(4%, 6%) scale(1.05); }
+    66% { transform: translate(-3%, 4%) scale(0.96); }
+  }
+
+  .page-pricing .pricing-card {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    margin-inline: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    padding: clamp(1.35rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2.25rem);
+    border-radius: 20px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, #f8fafc 55%, #f1f5f9 100%);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 18px 40px -12px rgba(15, 23, 42, 0.12),
+      0 40px 80px -24px rgba(2, 132, 199, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    animation: pricingCardFloat 6.5s ease-in-out infinite;
+    transition: box-shadow 0.35s ease, transform 0.35s ease;
+  }
+  .page-pricing .pricing-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), transparent 40%, transparent 60%, rgba(14, 165, 233, 0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.75;
+    animation: pricingShine 8s ease-in-out infinite;
+  }
+  @keyframes pricingCardFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes pricingShine {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+  }
+  .page-pricing .pricing-card:hover {
+    animation: none;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 22px 48px -10px rgba(15, 23, 42, 0.14),
+      0 48px 96px -28px rgba(2, 132, 199, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-4px);
+  }
+
+  .page-pricing .pricing-card-main {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  .page-pricing .pricing-card-actions {
+    flex: 0 1 200px;
+    min-width: min(100%, 200px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.55rem;
+    align-self: center;
+  }
+  @media (max-width: 640px) {
+    .page-pricing .pricing-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .page-pricing .pricing-card-actions {
+      flex: 1 1 auto;
+      align-self: stretch;
+      min-width: 0;
+    }
+  }
+
+  .page-pricing .checks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.65rem;
+  }
+  .page-pricing .checks li {
+    padding-left: 1.4rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .page-pricing .checks li:hover {
+    background: rgba(224, 242, 254, 0.45);
+  }
+
+  .page-pricing .price {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page-pricing .pricing-faq .faq-item {
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .page-pricing .pricing-faq .faq-item:hover {
+    border-color: rgba(2, 132, 199, 0.25);
+  }
+</style>
+{% endblock %}
+
+{% block website_hero %}
+<div class="page-hero js-reveal">
+  <span class="hero-tag">{% if request.LANGUAGE_CODE == 'sw' %}Bei{% else %}Pricing{% endif %}</span>
+  <h1>{% if request.LANGUAGE_CODE == 'sw' %}Bei wazi, bila mchezo{% else %}Straightforward pricing{% endif %}</h1>
+  <p>{% if request.LANGUAGE_CODE == 'sw' %}Mpango mmoja unaojumuisha vipengele muhimu vyote vya kuanzia.{% else %}One starter plan that includes the essentials to go live quickly.{% endif %}</p>
+</div>
+{% endblock %}
+
+{% block website_content %}
+<section class="pricing-band" aria-labelledby="pricing-plan-heading">
+  <div class="pricing-stack js-reveal">
+    <div class="pricing-ambient" aria-hidden="true">
+    <span></span><span></span><span></span>
+    </div>
+    <article class="pricing-card">
+      <div class="pricing-card-main">
+        <p class="meta" id="pricing-plan-heading">{% if request.LANGUAGE_CODE == 'sw' %}Mpango wa mwanzo{% else %}Starter{% endif %}</p>
+        <p class="price">10,000 TZS <span>/ {% if request.LANGUAGE_CODE == 'sw' %}mwezi{% else %}month{% endif %}</span></p>
+        <ul class="checks">
+          {% if request.LANGUAGE_CODE == 'sw' %}
+          <li>Usimamizi wa hesabu ya dawa</li>
+          <li>Mfumo wa mauzo wa haraka</li>
+          <li>Tahadhari za muda wa kuisha</li>
+          <li>Ripoti za msingi za mauzo</li>
+          {% else %}
+          <li>Inventory management</li>
+          <li>Fast POS checkout</li>
+          <li>Expiry alerts</li>
+          <li>Core sales reports</li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="pricing-card-actions">
+        <a class="btn btn-primary" href="{% url 'register' %}">{% if request.LANGUAGE_CODE == 'sw' %}Anza sasa{% else %}Get started{% endif %}</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}">{% if request.LANGUAGE_CODE == 'sw' %}Nina akaunti{% else %}I have an account{% endif %}</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section js-reveal pricing-faq">
+  <h2>{% if request.LANGUAGE_CODE == 'sw' %}Maswali ya mara kwa mara{% else %}Pricing questions{% endif %}</h2>
+  <div class="faq-list">
+    <article class="faq-item open">
+      <button type="button" class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Je, 10,000 TZS ni bei ya mwisho?{% else %}Is 10,000 TZS the full monthly price?{% endif %}</span><span>⌄</span></button>
+      <div class="faq-content">
+        <div class="faq-content-inner">{% if request.LANGUAGE_CODE == 'sw' %}Ndiyo kwa mpango wa mwanzo — hakuna malipo ya siri ya kila kitufe.{% else %}Yes for the starter plan, with no hidden per-seat fees for the included features.{% endif %}</div>
+      </div>
+    </article>
+    <article class="faq-item">
+      <button type="button" class="faq-btn"><span>{% if request.LANGUAGE_CODE == 'sw' %}Kuna ada ya kusanidi?{% else %}Is there a setup fee?{% endif %}</span><span>⌄</span></button>
+      <div class="faq-content">
+        <div class="faq-content-inner">{% if request.LANGUAGE_CODE == 'sw' %}Hapana — unajisajili na kuanza moja kwa moja.{% else %}No separate setup fee; sign up and start onboarding your pharmacy.{% endif %}</div>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

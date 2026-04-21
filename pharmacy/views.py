@@ -51,6 +51,26 @@ def _expiry_warning_days():
     return getattr(settings, "PHARMACY_EXPIRY_WARNING_DAYS", 90)
 
 
+def landing(request):
+    return render(request, "pharmacy/website_home.html")
+
+
+def website_features(request):
+    return render(request, "pharmacy/website_features.html")
+
+
+def website_pricing(request):
+    return render(request, "pharmacy/website_pricing.html")
+
+
+def website_about(request):
+    return render(request, "pharmacy/website_about.html")
+
+
+def website_contact(request):
+    return render(request, "pharmacy/website_contact.html")
+
+
 def service_worker(request):
     path = Path(__file__).resolve().parent / "static" / "pharmacy" / "sw.js"
     return HttpResponse(path.read_text(encoding="utf-8"), content_type="application/javascript")
